@@ -55,8 +55,11 @@ export default function Navbar() {
     { path: "/gallery", label: "Operations Gallery" },
   ];
 
+  const isAdminRoute = location.pathname.startsWith("/admin");
+  const showScrolled = scrolled || isAdminRoute;
+
   return (
-    <nav className={`navbar ${scrolled ? "navbar-scrolled" : ""}`}>
+    <nav className={`navbar ${showScrolled ? "navbar-scrolled" : ""}`}>
       <div className="navbar-container">
         {/* Brand Logo */}
         <Link to="/" className="navbar-logo-link">

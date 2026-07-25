@@ -166,6 +166,23 @@ button, input, textarea, select {
   overflow: hidden;
 }
 
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -50%;
+  width: 25%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transform: skewX(-20deg);
+  pointer-events: none;
+}
+
+.btn:hover::after {
+  left: 150%;
+  transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
 .btn-primary {
   background: var(--color-tech-gradient);
   color: var(--text-white);

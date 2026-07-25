@@ -364,6 +364,7 @@ const styleStyle = (
     .dashboard-page {
       background: #02040a;
       min-height: 100vh;
+      padding: 140px 24px 60px 24px;
     }
 
     .dashboard-main-layout {
@@ -630,17 +631,37 @@ const styleStyle = (
       gap: 20px;
     }
 
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .form-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-light);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      text-align: left;
+    }
+
     .dashboard-add-form input, .dashboard-add-form select, .dashboard-add-form textarea {
       background: rgba(13, 24, 56, 0.4);
       border: 1px solid var(--border-glass-blue);
       color: var(--text-white);
-      padding: 10px 14px;
+      padding: 12px 16px;
       border-radius: 4px;
       outline: none;
+      width: 100%;
+      transition: var(--transition-smooth);
     }
 
     .dashboard-add-form input:focus, .dashboard-add-form select:focus, .dashboard-add-form textarea:focus {
       border-color: var(--color-gold);
+      box-shadow: 0 0 10px rgba(197, 160, 89, 0.3);
+      background: rgba(13, 24, 56, 0.6);
     }
 
     .btn-add-prod {
