@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { Menu, X, ShieldAlert, Cpu } from "lucide-react";
+import { Menu, X, ShieldAlert, Cpu, ChevronDown } from "lucide-react";
 import { subscribeToAuth } from "../firebase";
 
 export default function Navbar() {
@@ -35,19 +35,24 @@ export default function Navbar() {
     return () => unsubscribe();
   }, []);
 
-  const navLinks = [
-    { path: "/", label: "Home" },
-    { path: "/about", label: "About Us" },
+  // Dropdown Link Groups
+  const corporateLinks = [
+    { path: "/about", label: "About Company" },
     { path: "/md", label: "Managing Director" },
-    { path: "/products", label: "Products" },
+    { path: "/faq", label: "FAQ Desk" },
+  ];
+
+  const sourcingLinks = [
     { path: "/services", label: "Import Services" },
-    { path: "/sourcing", label: "Global Sourcing" },
-    { path: "/industries", label: "Industries" },
-    { path: "/qa", label: "Quality" },
+    { path: "/sourcing", label: "Global Network" },
+    { path: "/industries", label: "Industries We Serve" },
+  ];
+
+  const qualityLinks = [
+    { path: "/qa", label: "Quality Control" },
     { path: "/certifications", label: "Certifications" },
-    { path: "/portfolio", label: "Portfolio" },
-    { path: "/faq", label: "FAQ" },
-    { path: "/contact", label: "Contact Us" },
+    { path: "/portfolio", label: "Portfolio & Achievements" },
+    { path: "/gallery", label: "Operations Gallery" },
   ];
 
   return (
@@ -64,24 +69,78 @@ export default function Navbar() {
           </div>
         </Link>
 
-        {/* Desktop Links */}
+        {/* Desktop Menu */}
         <div className="navbar-desktop-menu">
-          {navLinks.map((link) => (
-            <NavLink
-              key={link.path}
-              to={link.path}
-              className={({ isActive }) =>
-                `nav-link ${isActive ? "nav-link-active" : ""}`
-              }
-            >
-              {link.label}
-            </NavLink>
-          ))}
+          <NavLink to="/" className={({ isActive }) => `nav-link ${isActive ? "nav-link-active" : ""}`}>
+            Home
+          </NavLink>
+
+          {/* Corporate Dropdown */}
+          <div className="nav-item-dropdown">
+            <button className="dropdown-trigger">
+              Corporate <ChevronDown size={12} />
+            </button>
+            <div className="dropdown-menu">
+              {corporateLinks.map((link) => (
+                <NavLink
+                  key={link.path}
+                  to={link.path}
+                  className={({ isActive }) => `dropdown-item ${isActive ? "dropdown-item-active" : ""}`}
+                >
+                  {link.label}
+                </NavLink>
+              ))}
+            </div>
+          </div>
+
+          <NavLink to="/products" className={({ isActive }) => `nav-link ${isActive ? "nav-link-active" : ""}`}>
+            Products
+          </NavLink>
+
+          {/* Sourcing Solutions Dropdown */}
+          <div className="nav-item-dropdown">
+            <button className="dropdown-trigger">
+              Sourcing <ChevronDown size={12} />
+            </button>
+            <div className="dropdown-menu">
+              {sourcingLinks.map((link) => (
+                <NavLink
+                  key={link.path}
+                  to={link.path}
+                  className={({ isActive }) => `dropdown-item ${isActive ? "dropdown-item-active" : ""}`}
+                >
+                  {link.label}
+                </NavLink>
+              ))}
+            </div>
+          </div>
+
+          {/* Quality & Trust Dropdown */}
+          <div className="nav-item-dropdown">
+            <button className="dropdown-trigger">
+              Quality &amp; Standards <ChevronDown size={12} />
+            </button>
+            <div className="dropdown-menu">
+              {qualityLinks.map((link) => (
+                <NavLink
+                  key={link.path}
+                  to={link.path}
+                  className={({ isActive }) => `dropdown-item ${isActive ? "dropdown-item-active" : ""}`}
+                >
+                  {link.label}
+                </NavLink>
+              ))}
+            </div>
+          </div>
+
+          <NavLink to="/contact" className={({ isActive }) => `nav-link ${isActive ? "nav-link-active" : ""}`}>
+            Contact Us
+          </NavLink>
           
-          {/* Admin link */}
+          {/* Admin desk button */}
           {adminUser ? (
             <NavLink to="/admin/dashboard" className="nav-btn-admin admin-active">
-              <ShieldAlert size={15} /> Admin Portal
+              <ShieldAlert size={14} /> Admin Desk
             </NavLink>
           ) : (
             <NavLink to="/admin/login" className="nav-btn-admin">
@@ -100,37 +159,76 @@ export default function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Links */}
+      {/* Mobile Sidebar Navigation */}
       <div className={`navbar-mobile-menu ${isOpen ? "mobile-menu-open" : ""}`}>
-        {navLinks.map((link) => (
-          <NavLink
-            key={link.path}
-            to={link.path}
-            onClick={() => setIsOpen(false)}
-            className={({ isActive }) =>
-              `mobile-nav-link ${isActive ? "mobile-nav-link-active" : ""}`
-            }
-          >
-            {link.label}
+        {/* Main Section */}
+        <div className="mobile-section-block">
+          <span className="mobile-section-hdr">Main Directory</span>
+          <NavLink to="/" className={({ isActive }) => `mobile-nav-link ${isActive ? "mobile-nav-link-active" : ""}`}>
+            Home
           </NavLink>
-        ))}
-        {adminUser ? (
-          <Link
-            to="/admin/dashboard"
-            onClick={() => setIsOpen(false)}
-            className="mobile-nav-link mobile-nav-admin"
-          >
-            <ShieldAlert size={16} style={{ marginRight: 6 }} /> Admin Portal
-          </Link>
-        ) : (
-          <Link
-            to="/admin/login"
-            onClick={() => setIsOpen(false)}
-            className="mobile-nav-link mobile-nav-admin"
-          >
-            Admin Login
-          </Link>
-        )}
+          <NavLink to="/products" className={({ isActive }) => `mobile-nav-link ${isActive ? "mobile-nav-link-active" : ""}`}>
+            Products Catalog
+          </NavLink>
+          <NavLink to="/contact" className={({ isActive }) => `mobile-nav-link ${isActive ? "mobile-nav-link-active" : ""}`}>
+            Contact Us
+          </NavLink>
+        </div>
+
+        {/* Corporate Section */}
+        <div className="mobile-section-block">
+          <span className="mobile-section-hdr">Corporate Profile</span>
+          {corporateLinks.map((link) => (
+            <NavLink
+              key={link.path}
+              to={link.path}
+              className={({ isActive }) => `mobile-nav-link ${isActive ? "mobile-nav-link-active" : ""}`}
+            >
+              {link.label}
+            </NavLink>
+          ))}
+        </div>
+
+        {/* Sourcing Section */}
+        <div className="mobile-section-block">
+          <span className="mobile-section-hdr">Sourcing Desk</span>
+          {sourcingLinks.map((link) => (
+            <NavLink
+              key={link.path}
+              to={link.path}
+              className={({ isActive }) => `mobile-nav-link ${isActive ? "mobile-nav-link-active" : ""}`}
+            >
+              {link.label}
+            </NavLink>
+          ))}
+        </div>
+
+        {/* Quality Section */}
+        <div className="mobile-section-block">
+          <span className="mobile-section-hdr">Quality &amp; Standards</span>
+          {qualityLinks.map((link) => (
+            <NavLink
+              key={link.path}
+              to={link.path}
+              className={({ isActive }) => `mobile-nav-link ${isActive ? "mobile-nav-link-active" : ""}`}
+            >
+              {link.label}
+            </NavLink>
+          ))}
+        </div>
+
+        {/* Admin Link at Bottom */}
+        <div className="mobile-section-block" style={{ marginTop: 10, border: "none" }}>
+          {adminUser ? (
+            <Link to="/admin/dashboard" className="mobile-nav-link mobile-nav-admin">
+              <ShieldAlert size={16} style={{ marginRight: 6 }} /> Admin Portal
+            </Link>
+          ) : (
+            <Link to="/admin/login" className="mobile-nav-link mobile-nav-admin">
+              Admin Login Desk
+            </Link>
+          )}
+        </div>
       </div>
 
       <style>{`
@@ -177,8 +275,8 @@ export default function Navbar() {
 
         .logo-svg-icon {
           color: var(--color-cyan);
-          width: 28px;
-          height: 28px;
+          width: 26px;
+          height: 26px;
           filter: drop-shadow(0 0 8px rgba(0, 225, 255, 0.6));
           animation: float 4s ease-in-out infinite;
         }
@@ -191,7 +289,7 @@ export default function Navbar() {
 
         .brand-primary {
           font-family: var(--font-display);
-          font-size: 1.35rem;
+          font-size: 1.3rem;
           font-weight: 800;
           letter-spacing: 2px;
           color: var(--text-white);
@@ -208,7 +306,7 @@ export default function Navbar() {
         .navbar-desktop-menu {
           display: flex;
           align-items: center;
-          gap: 20px;
+          gap: 24px;
         }
 
         .nav-link {
@@ -250,10 +348,87 @@ export default function Navbar() {
           background: var(--color-gold-gradient);
         }
 
+        /* Hover Dropdown styles */
+        .nav-item-dropdown {
+          position: relative;
+        }
+
+        .dropdown-trigger {
+          font-size: 0.85rem;
+          font-weight: 500;
+          color: var(--text-muted);
+          text-transform: uppercase;
+          letter-spacing: 1px;
+          padding: 8px 4px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 6px;
+          background: none;
+          border: none;
+          outline: none;
+          transition: var(--transition-fast);
+        }
+
+        .dropdown-trigger:hover {
+          color: var(--text-white);
+        }
+
+        .dropdown-menu {
+          position: absolute;
+          top: 100%;
+          left: 50%;
+          transform: translateX(-50%) translateY(10px);
+          background: rgba(8, 13, 34, 0.98);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid var(--border-glass-blue);
+          box-shadow: var(--shadow-premium);
+          border-radius: 6px;
+          padding: 10px 0;
+          min-width: 220px;
+          display: flex;
+          flex-direction: column;
+          gap: 2px;
+          opacity: 0;
+          visibility: hidden;
+          transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+          z-index: 1000;
+        }
+
+        .nav-item-dropdown:hover .dropdown-menu {
+          opacity: 1;
+          visibility: visible;
+          transform: translateX(-50%) translateY(0);
+        }
+
+        .dropdown-item {
+          font-size: 0.8rem;
+          color: var(--text-muted);
+          padding: 10px 20px;
+          text-align: left;
+          transition: var(--transition-fast);
+          display: block;
+          white-space: nowrap;
+        }
+
+        .dropdown-item:hover {
+          color: var(--color-gold-bright);
+          background: rgba(197, 160, 89, 0.08);
+          padding-left: 24px;
+        }
+
+        .dropdown-item-active {
+          color: var(--color-gold-bright) !important;
+          font-weight: 600;
+          background: rgba(197, 160, 89, 0.04);
+        }
+
+        /* Admin Link */
         .nav-btn-admin {
           font-size: 0.8rem;
           font-weight: 600;
-          padding: 6px 14px;
+          padding: 8px 16px;
           border-radius: 4px;
           text-transform: uppercase;
           letter-spacing: 0.5px;
@@ -263,6 +438,7 @@ export default function Navbar() {
           display: flex;
           align-items: center;
           gap: 6px;
+          transition: var(--transition-smooth);
         }
 
         .nav-btn-admin:hover {
@@ -298,55 +474,73 @@ export default function Navbar() {
           color: var(--color-cyan);
         }
 
-        /* Mobile Menu */
+        /* Mobile Sidebar Menu (Categorized) */
         .navbar-mobile-menu {
           position: fixed;
           top: 0;
           right: -100%;
-          width: 280px;
+          width: 320px;
           height: 100vh;
           background: rgba(4, 7, 18, 0.98);
-          backdrop-filter: blur(20px);
-          -webkit-backdrop-filter: blur(20px);
+          backdrop-filter: blur(24px);
+          -webkit-backdrop-filter: blur(24px);
           border-left: 1px solid var(--border-glass-blue);
-          padding: 100px 30px 40px 30px;
+          padding: 90px 24px 40px 24px;
           display: flex;
           flex-direction: column;
-          gap: 20px;
+          gap: 25px;
+          overflow-y: auto;
           transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
           z-index: 999;
-          box-shadow: -10px 0 30px rgba(0, 0, 0, 0.8);
+          box-shadow: -15px 0 35px rgba(0, 0, 0, 0.8);
         }
 
         .mobile-menu-open {
           right: 0;
         }
 
+        .mobile-section-block {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+          padding-bottom: 12px;
+        }
+
+        .mobile-section-hdr {
+          font-family: var(--font-display);
+          font-size: 0.7rem;
+          font-weight: 700;
+          text-transform: uppercase;
+          color: var(--color-gold-bright);
+          letter-spacing: 1.5px;
+          margin-bottom: 4px;
+        }
+
         .mobile-nav-link {
-          font-size: 1rem;
+          font-size: 0.9rem;
           font-weight: 500;
           color: var(--text-muted);
           text-transform: uppercase;
-          letter-spacing: 1px;
-          padding: 10px 0;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+          letter-spacing: 0.5px;
+          padding: 8px 0;
+          transition: var(--transition-fast);
         }
 
         .mobile-nav-link:hover, .mobile-nav-link-active {
-          color: var(--color-gold-bright);
-          padding-left: 8px;
+          color: var(--text-white);
+          padding-left: 6px;
         }
 
         .mobile-nav-admin {
-          color: var(--color-cyan);
+          color: var(--color-cyan) !important;
           border-bottom: none;
           font-weight: 600;
-          margin-top: 15px;
           display: flex;
           align-items: center;
         }
 
-        @media (max-width: 1150px) {
+        @media (max-width: 1050px) {
           .navbar-desktop-menu {
             display: none;
           }

@@ -683,6 +683,61 @@ const styleStyle = (
     @media (max-width: 991px) {
       .dashboard-main-layout {
         grid-template-columns: 1fr;
+        gap: 25px;
+      }
+      .dashboard-sidebar {
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 15px;
+        padding: 20px;
+      }
+      .sidebar-admin-profile {
+        border-bottom: none;
+        padding-bottom: 0;
+      }
+      .sidebar-navigation {
+        flex-direction: row;
+        gap: 10px;
+        width: auto;
+      }
+      .btn-sidebar-signout {
+        margin-top: 0;
+        padding: 10px 16px;
+        width: auto;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .record-info-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+      .form-row-two {
+        grid-template-columns: 1fr;
+        gap: 15px;
+      }
+    }
+
+    @media (max-width: 650px) {
+      .dashboard-sidebar {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 20px;
+      }
+      .sidebar-navigation {
+        flex-direction: column;
+        width: 100%;
+      }
+      .sidebar-admin-profile {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        padding-bottom: 15px;
+        justify-content: center;
+      }
+      .btn-sidebar-signout {
+        width: 100%;
+        justify-content: center;
       }
     }
   `}</style>
