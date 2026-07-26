@@ -1,45 +1,25 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { 
-  getInquiries, getProducts, addProduct, deleteProduct, 
+  getInquiries, 
   deleteInquiry, updateInquiryStatus, logoutAdmin 
 } from "../firebase";
 import { 
-  MessageSquare, Layers, Plus, Trash2, Check, LogOut, 
-  User, Mail, Phone, Building, Briefcase, PlusCircle, ShieldAlert 
+  MessageSquare, Trash2, Check, LogOut, 
+  User, Mail, Phone, Building, Briefcase, ShieldAlert 
 } from "lucide-react";
 import confetti from "canvas-confetti";
 
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState("inquiries");
   const [inquiries, setInquiries] = useState([]);
-  const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-
-  // Form State for New Product
-  const [prodForm, setProdForm] = useState({
-    name: "",
-    category: "PCB",
-    description: "",
-    features: "",
-    specifications: "",
-    applications: ""
-  });
-
-  const categoriesList = [
-    "PCB", "PCBA", "WiFi Routers", "Networking Devices", "Industrial Electronics", 
-    "Consumer Electronics", "Smart Devices", "IoT Devices", "Communication Devices", 
-    "Electronic Components", "Embedded Hardware", "Custom Electronic Solutions"
-  ];
 
   const loadAllData = async () => {
     setLoading(true);
     try {
       const inqs = await getInquiries();
-      const prods = await getProducts();
       setInquiries(inqs);
-      setProducts(prods);
     } catch (err) {
       console.error("Error loading dashboard data:", err);
     } finally {
@@ -80,68 +60,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleAddProduct = async (e) => {
-    e.preventDefault();
-    if (!prodForm.name || !prodForm.description) {
-      alert("Please fill in Product Name and Description.");
-      return;
-    }
 
-    // Parse specifications string: "Key: Val, Key2: Val2" into object
-    const specsObj = {};
-    if (prodForm.specifications.trim()) {
-      const pairs = prodForm.specifications.split(",");
-      pairs.forEach(pair => {
-        const [k, v] = pair.split(":");
-        if (k && v) {
-          specsObj[k.trim()] = v.trim();
-        }
-      });
-    }
-
-    const payload = {
-      name: prodForm.name,
-      category: prodForm.category,
-      description: prodForm.description,
-      features: prodForm.features,
-      specifications: specsObj,
-      applications: prodForm.applications
-    };
-
-    try {
-      const res = await addProduct(payload);
-      if (res.success) {
-        confetti({
-          particleCount: 100,
-          spread: 80,
-          colors: ["#c5a059", "#00e1ff"]
-        });
-        setProdForm({
-          name: "",
-          category: "PCB",
-          description: "",
-          features: "",
-          specifications: "",
-          applications: ""
-        });
-        loadAllData();
-      } else {
-        alert("Failed to add product: " + res.error);
-      }
-    } catch (err) {
-      alert("Failed to process product upload.");
-    }
-  };
-
-  const handleDeleteProduct = async (prodId) => {
-    if (!window.confirm("Are you sure you want to delete this product from the public catalog?")) return;
-    try {
-      await deleteProduct(prodId);
-      loadAllData();
-    } catch (err) {
-      alert("Failed to delete product.");
-    }
-  };
 
   return (
     <div className="dashboard-page page-padding">
@@ -158,16 +77,9 @@ export default function AdminDashboard() {
           
           <div className="sidebar-navigation">
             <button 
-              onClick={() => setActiveTab("inquiries")} 
-              className={`sidebar-nav-btn ${activeTab === "inquiries" ? "active-sidebar-nav" : ""}`}
+              className="sidebar-nav-btn active-sidebar-nav"
             >
               <MessageSquare size={16} /> B2B Inquiries Desk ({inquiries.length})
-            </button>
-            <button 
-              onClick={() => setActiveTab("products")} 
-              className={`sidebar-nav-btn ${activeTab === "products" ? "active-sidebar-nav" : ""}`}
-            >
-              <Layers size={16} /> Public Catalog Editor ({products.length})
             </button>
           </div>
 
@@ -183,7 +95,7 @@ export default function AdminDashboard() {
               <ShieldAlert className="loader-shield-icon animate-pulse" size={48} />
               <p>Syncing secure database credentials...</p>
             </div>
-          ) : activeTab === "inquiries" ? (
+          ) : (
             /* INQUIRIES PANELS */
             <div className="dashboard-inqs-panel">
               <div className="panel-header">
@@ -239,116 +151,6 @@ export default function AdminDashboard() {
                   ))}
                 </div>
               )}
-            </div>
-          ) : (
-            /* PRODUCTS CATALOG EDITORS PANEL */
-            <div className="dashboard-products-panel">
-              <div className="panel-header">
-                <h2>Public Catalog Sourcing Editor</h2>
-                <p>Manage items showcased in the client product directory.</p>
-              </div>
-
-              {/* Add Product Form */}
-              <div className="add-product-form-box glass-card" style={{ marginBottom: 40 }}>
-                <h3><PlusCircle size={18} className="panel-title-icon" /> Upload New Tech Sourcing Item</h3>
-                
-                <form onSubmit={handleAddProduct} className="dashboard-add-form">
-                  <div className="form-row-two">
-                    <div className="form-group">
-                      <label>Product Name *</label>
-                      <input 
-                        type="text" 
-                        value={prodForm.name} 
-                        onChange={(e) => setProdForm({ ...prodForm, name: e.target.value })}
-                        placeholder="e.g. Multi-layer High Frequency PCB"
-                        required
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label>Product Category *</label>
-                      <select 
-                        value={prodForm.category} 
-                        onChange={(e) => setProdForm({ ...prodForm, category: e.target.value })}
-                      >
-                        {categoriesList.map((cat, idx) => (
-                          <option key={idx} value={cat}>{cat}</option>
-                        ))}
-                      </select>
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Description *</label>
-                    <textarea 
-                      rows="3"
-                      value={prodForm.description}
-                      onChange={(e) => setProdForm({ ...prodForm, description: e.target.value })}
-                      placeholder="Describe core component functions..."
-                      required
-                    ></textarea>
-                  </div>
-
-                  <div className="form-group">
-                    <label>Key Features (comma-separated list)</label>
-                    <input 
-                      type="text" 
-                      value={prodForm.features}
-                      onChange={(e) => setProdForm({ ...prodForm, features: e.target.value })}
-                      placeholder="e.g. WPA3 Security, AX3000 speeds, MU-MIMO support"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Technical Specifications (comma-separated 'Key: Value' pairs)</label>
-                    <input 
-                      type="text" 
-                      value={prodForm.specifications}
-                      onChange={(e) => setProdForm({ ...prodForm, specifications: e.target.value })}
-                      placeholder="e.g. Layers: 16, Impedance: 50 ohms, Thickness: 1.6mm"
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label>Applications</label>
-                    <input 
-                      type="text" 
-                      value={prodForm.applications}
-                      onChange={(e) => setProdForm({ ...prodForm, applications: e.target.value })}
-                      placeholder="e.g. Telecom routers, smart server blades"
-                    />
-                  </div>
-
-                  <button type="submit" className="btn btn-gold btn-add-prod">
-                    <Plus size={16} /> Publish To Catalog
-                  </button>
-                </form>
-              </div>
-
-              {/* Products List & Deletion */}
-              <div className="existing-products-box">
-                <h3>Existing Sourcing Items ({products.length})</h3>
-                {products.length === 0 ? (
-                  <div className="empty-panel-msg glass-card">No products present in registry database.</div>
-                ) : (
-                  <div className="dashboard-products-list">
-                    {products.map((prod) => (
-                      <div className="dashboard-prod-row glass-card" key={prod.id}>
-                        <div className="prod-row-meta">
-                          <h4>{prod.name}</h4>
-                          <span className="prod-row-cat-tag">{prod.category}</span>
-                        </div>
-                        <button 
-                          onClick={() => handleDeleteProduct(prod.id)} 
-                          className="btn-action-delete"
-                          title="Delete Product"
-                        >
-                          <Trash2 size={14} /> Remove Item
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
             </div>
           )}
         </main>

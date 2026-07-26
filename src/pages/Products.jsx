@@ -1,18 +1,201 @@
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Search, SlidersHorizontal, Eye, X, BookOpen, Settings, CheckCircle2, ShoppingBag } from "lucide-react";
-import { getProducts } from "../firebase";
+
+
+const STATIC_PRODUCTS = [
+  {
+    id: "prod-pcb-1",
+    name: "High-Density Multilayer PCB",
+    category: "PCB",
+    description: "Premium grade multi-layer FR-4 printed circuit boards designed for high-frequency signal integrity and thermal efficiency in telecom applications.",
+    features: ["Up to 32 Layers", "Impedance Controlled", "Halogen-Free Options", "Gold Finger Plating"],
+    specifications: {
+      "Base Material": "FR-4 High TG / Rogers / Polyimide",
+      "Board Thickness": "0.4mm - 3.2mm",
+      "Min Trace Width/Spacing": "3mil / 3mil",
+      "Surface Finish": "ENIG / HASL / OSP"
+    },
+    applications: "Telecommunications base stations, networking switches, server motherboards, industrial robotics control boards.",
+    gallery: ["https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80"]
+  },
+  {
+    id: "prod-pcb-2",
+    name: "Flexible Rigid PCB (Rigid-Flex)",
+    category: "PCB",
+    description: "Hybrid rigid-flex PCBs providing extreme space efficiency, dynamic flexing cycles, and high interconnect reliability for medical and aerospace tech.",
+    features: ["Polymide Flexible Film", "High Vibration Resistance", "3D Dynamic Flexing", "No Cable Connector Needed"],
+    specifications: {
+      "Layer Count": "2 - 12 Layers",
+      "Flex Core Thickness": "2mil - 5mil",
+      "Adhesive Layer": "Acrylic / Epoxy",
+      "Copper Weight": "0.5oz - 2oz"
+    },
+    applications: "Medical wearables, folding smartphone hinge displays, aerospace telemetry.",
+    gallery: ["https://images.unsplash.com/photo-1563770660941-20978e870e26?auto=format&fit=crop&w=600&q=80"]
+  },
+  {
+    id: "prod-pcba-1",
+    name: "Industrial SMT PCBA Assembly",
+    category: "PCBA",
+    description: "Turnkey PCBA manufacturing utilizing advanced high-speed SMT assembly, automated optical inspection (AOI), and functional testing.",
+    features: ["01005 Component Placement", "BGA & QFN Fine Pitch SMT", "Conformal Coating", "X-Ray Solder Inspection"],
+    specifications: {
+      "SMT Line Speed": "80,000 components/hour",
+      "Testing Capabilities": "ICT, FCT, AOI, Flying Probe, X-Ray",
+      "Lead-free Compliance": "RoHS / REACH Compliant",
+      "IPC Standard": "IPC-A-610 Class II / Class III"
+    },
+    applications: "Automotive engine control units, medical diagnostics, high-reliability smart grid power meters.",
+    gallery: ["https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=600&q=80"]
+  },
+  {
+    id: "prod-pcba-2",
+    name: "IoT Embedded PCB Assembly",
+    category: "PCBA",
+    description: "Custom printed circuit board assembly optimized for low-power IoT sensor nodes, containing integrated RF shields and BLE modules.",
+    features: ["Low-power design layout", "BLE & WiFi integration", "Selective Wave Soldering", "Underfill encapsulation"],
+    specifications: {
+      "BGA Pitch": "Down to 0.4mm",
+      "Component Height Limit": "1.2mm",
+      "PCB Laminate": "High-TG FR4",
+      "Assembly Standard": "IPC J-STD-001"
+    },
+    applications: "Industrial telemetry, environment sensors, smart lighting controls.",
+    gallery: ["https://images.unsplash.com/photo-1555664424-778a1e5e1b48?auto=format&fit=crop&w=600&q=80"]
+  },
+  {
+    id: "prod-router-1",
+    name: "Enterprise Dual-Band WiFi 6 Router",
+    category: "WiFi Routers",
+    description: "High-capacity WiFi 6 gigabit wireless router engineered for dense B2B office networks and enterprise smart device environments.",
+    features: ["AX3000 Speeds", "MU-MIMO & OFDMA", "WPA3 Security Protocol", "8x High-Gain External Antennas"],
+    specifications: {
+      "Wireless Speed": "2402 Mbps (5GHz) + 574 Mbps (2.4GHz)",
+      "Ethernet Ports": "1x 2.5G WAN Port, 4x Gigabit LAN Ports",
+      "Concurrent Clients": "Up to 256 active devices",
+      "Processor": "1.8 GHz Quad-Core CPU"
+    },
+    applications: "Corporate offices, education campus hubs, hotels, high-traffic commercial zones.",
+    gallery: ["https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=600&q=80"]
+  },
+  {
+    id: "prod-router-2",
+    name: "High-Power Outdoor Mesh Node",
+    category: "WiFi Routers",
+    description: "Weatherproof IP67 rated outdoor wireless access point with mesh networking support for continuous public WiFi coverage.",
+    features: ["IP67 Weatherproof", "Seamless Roaming Mesh", "PoE Injector Powered", "Dual-Band Omni Antennas"],
+    specifications: {
+      "Antenna Gain": "5dBi Omni (Integrated)",
+      "Max Range": "300 Meters (Line of Sight)",
+      "PoE Standard": "802.3at PoE+",
+      "Temperature Limit": "-40°C to 65°C"
+    },
+    applications: "Public parks, warehouse yards, industrial campuses, farming estates.",
+    gallery: ["https://images.unsplash.com/photo-1551703599-6b3e8379aa8b?auto=format&fit=crop&w=600&q=80"]
+  },
+  {
+    id: "prod-net-1",
+    name: "Gigabit Fiber Optic Media Converter",
+    category: "Networking Devices",
+    description: "High-performance Ethernet-to-Fiber media converter extending copper network distances up to 20km over single-mode fiber optic cabling.",
+    features: ["Hot-Swappable SFP Slots", "Auto-Negotiation Flow", "Link Fault Pass-Through", "Low Power Draw"],
+    specifications: {
+      "Wavelength": "1310nm / 1550nm",
+      "Fiber Type": "Single-Mode / Multi-Mode",
+      "Interface": "SC Duplex / LC SFP Slot",
+      "Distance": "Up to 20 km"
+    },
+    applications: "Data centers, CCTV networks, metropolitan campus fiber loops.",
+    gallery: ["https://images.unsplash.com/photo-1562408590-e32931084e23?auto=format&fit=crop&w=600&q=80"]
+  },
+  {
+    id: "prod-net-2",
+    name: "24-Port Managed Gigabit PoE Switch",
+    category: "Networking Devices",
+    description: "Layer 2+ managed network switch delivering PoE power up to 370W to IP cameras, VoIP phones, and wireless access points.",
+    features: ["Layer 2+ Management", "370W Total PoE Budget", "4x 10G SFP+ Uplink Ports", "Static Routing Support"],
+    specifications: {
+      "Switching Capacity": "128 Gbps",
+      "PoE Ports": "24x RJ45 802.3at/af",
+      "Console Interface": "RJ45 & Micro-USB",
+      "Rackmount Height": "1U standard"
+    },
+    applications: "Office networks, high-definition IP camera networks, server racks.",
+    gallery: ["https://images.unsplash.com/photo-1597733336794-12d05021d510?auto=format&fit=crop&w=600&q=80"]
+  },
+  {
+    id: "prod-iot-1",
+    name: "B2B IoT Smart Gateway Hub",
+    category: "IoT Devices",
+    description: "Multi-protocol IoT gateway supporting Zigbee, Z-Wave, BLE, and WiFi to bridge smart sensors directly to cloud infrastructure.",
+    features: ["Multi-protocol Support", "Edge Computing Capability", "Local Automations Storage", "Power-over-Ethernet (PoE)"],
+    specifications: {
+      "Protocols": "Zigbee 3.0, Bluetooth 5.2, Thread, WiFi 2.4/5GHz",
+      "Input Voltage": "PoE (802.3af) or 5V 2A USB-C",
+      "Operating Temp": "-10°C to 50°C",
+      "SDK Availability": "Python / C++ Client SDK"
+    },
+    applications: "Smart building automation, warehouse environment monitoring, smart agriculture networks.",
+    gallery: ["https://images.unsplash.com/photo-1558346490-a72e53ae2d4f?auto=format&fit=crop&w=600&q=80"]
+  },
+  {
+    id: "prod-iot-2",
+    name: "Industrial Edge Computing Gateway",
+    category: "IoT Devices",
+    description: "Ruggedized fanless industrial PC designed for high-performance edge computing, analytics, and Modbus protocol conversion.",
+    features: ["Fanless Aluminium Chassis", "Modbus & OPC UA Support", "Wide Input Voltage range", "Dual SIM LTE failover"],
+    specifications: {
+      "Processor": "Intel Quad-Core Atom CPU",
+      "RAM / Storage": "8GB DDR4 / 128GB SSD",
+      "Serial Ports": "2x RS232/425, 2x RJ45",
+      "Mounting Option": "DIN Rail mount"
+    },
+    applications: "Factory PLC gateway, heavy machinery diagnostics, solar grid telecommunication.",
+    gallery: ["https://images.unsplash.com/photo-1600132806370-bf17e65e942f?auto=format&fit=crop&w=600&q=80"]
+  },
+  {
+    id: "prod-comp-1",
+    name: "ARM Cortex-M4 Microcontroller Chip",
+    category: "Electronic Components",
+    description: "High-performance ARM Cortex-M4 32-bit RISC processor core with DSP instructions, FPU, and rich embedded peripherals.",
+    features: ["180MHz Clock Speed", "Embedded FPU & DSP", "Rich Analog Peripherals", "Ultra-low Power Modes"],
+    specifications: {
+      "Flash / SRAM": "1MB Flash / 256KB SRAM",
+      "Package Type": "LQFP-100 / BGA-137",
+      "Operating Voltage": "1.7V - 3.6V",
+      "Interfaces": "CAN, SPI, I2C, USART, USB OTG"
+    },
+    applications: "Consumer wearables, drone flight controller, high-precision industrial sensors.",
+    gallery: ["https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=600&q=80"]
+  },
+  {
+    id: "prod-comp-2",
+    name: "Optoelectronic High-Speed Optocoupler",
+    category: "Electronic Components",
+    description: "High-speed optoelectronic isolator delivering 5000V isolation voltage and 10MBd data transfer speeds for safe industrial switching.",
+    features: ["5000 Vrms Isolation", "10 MBd Data Speed", "TTL / CMOS Compatible", "High Common Mode Rejection"],
+    specifications: {
+      "Isolation Voltage": "5000 Vrms",
+      "Max Forward Current": "20mA",
+      "Rise/Fall Time": "25ns / 25ns",
+      "Package Option": "DIP-8 / SMD-8"
+    },
+    applications: "Motor drives, power supplies, logic circuit isolation.",
+    gallery: ["https://images.unsplash.com/photo-1618042164219-62c820f10723?auto=format&fit=crop&w=600&q=80"]
+  }
+];
 
 export default function Products() {
   const [searchParams, setSearchParams] = useSearchParams();
   const initialCategory = searchParams.get("category") || "All";
 
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState(STATIC_PRODUCTS);
   const [filteredProducts, setFilteredProducts] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
 
   const categoriesList = [
     "All",
@@ -20,38 +203,9 @@ export default function Products() {
     "PCBA",
     "WiFi Routers",
     "Networking Devices",
-    "Industrial Electronics",
-    "Consumer Electronics",
-    "Smart Devices",
     "IoT Devices",
-    "Communication Devices",
-    "Electronic Components",
-    "Embedded Hardware",
-    "Custom Electronic Solutions"
+    "Electronic Components"
   ];
-
-  useEffect(() => {
-    // Load products
-    const loadProductsList = async () => {
-      setLoading(true);
-      try {
-        const data = await getProducts();
-        setProducts(data);
-      } catch (err) {
-        console.error("Error loading products:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    loadProductsList();
-
-    // Listen to localstorage updates in case admin edits product catalog
-    const handleStorageChange = () => {
-      loadProductsList();
-    };
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
-  }, []);
 
   useEffect(() => {
     // Filter and search
@@ -153,10 +307,13 @@ export default function Products() {
                       onClick={() => setSelectedProduct(product)}
                     >
                       <div className="product-img-wrapper">
-                        {/* Placeholder tech logo as card visual */}
-                        <div className="product-card-svg-placeholder">
-                          <ShoppingBag size={48} className="placeholder-bag-icon" />
-                        </div>
+                        {product.gallery && product.gallery[0] ? (
+                          <img src={product.gallery[0]} alt={product.name} className="product-card-img" />
+                        ) : (
+                          <div className="product-card-svg-placeholder">
+                            <ShoppingBag size={48} className="placeholder-bag-icon" />
+                          </div>
+                        )}
                         <span className="product-category-tag">{product.category}</span>
                       </div>
                       <div className="product-card-info">
@@ -186,9 +343,13 @@ export default function Products() {
             <div className="modal-grid">
               {/* Modal Image/Icon Panel */}
               <div className="modal-visual-panel">
-                <div className="modal-visual-box">
-                  <ShoppingBag size={80} className="modal-large-icon" />
-                </div>
+                {selectedProduct.gallery && selectedProduct.gallery[0] ? (
+                  <img src={selectedProduct.gallery[0]} alt={selectedProduct.name} className="modal-large-img" />
+                ) : (
+                  <div className="modal-visual-box">
+                    <ShoppingBag size={80} className="modal-large-icon" />
+                  </div>
+                )}
                 <span className="modal-tag">{selectedProduct.category}</span>
                 
                 <div className="modal-b2b-cta">
@@ -381,6 +542,27 @@ export default function Products() {
           align-items: center;
           justify-content: center;
           border-bottom: 1px solid var(--border-glass-blue);
+        }
+
+        .product-card-img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          transition: var(--transition-smooth);
+        }
+
+        .product-card:hover .product-card-img {
+          transform: scale(1.05);
+        }
+
+        .modal-large-img {
+          width: 180px;
+          height: 180px;
+          object-fit: cover;
+          border: 1px solid var(--border-glass-blue);
+          border-radius: 8px;
+          filter: drop-shadow(0 0 10px rgba(0, 225, 255, 0.2));
+          margin-bottom: 20px;
         }
 
         .product-card-svg-placeholder {
