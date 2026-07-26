@@ -178,6 +178,18 @@ export default function About() {
           align-items: center;
         }
 
+        @media (max-width: 600px) {
+          .story-grid {
+            gap: 30px;
+          }
+          .story-content {
+            order: 2;
+          }
+          .story-stats-panel {
+            order: 1;
+          }
+        }
+
         .lead-text {
           font-size: 1.15rem;
           color: var(--text-light);
@@ -195,6 +207,12 @@ export default function About() {
           border-left: 3px solid var(--color-gold);
           border-color: var(--border-glass-gold);
           padding: 20px;
+          transition: var(--transition-smooth);
+        }
+
+        .philosophy-box:hover {
+          transform: translateY(-4px);
+          box-shadow: var(--border-glow-gold);
         }
 
         .philosophy-box h4 {
@@ -211,6 +229,12 @@ export default function About() {
         .story-stats-panel {
           border-color: var(--border-glass-blue);
           padding: 30px;
+          transition: var(--transition-smooth);
+        }
+
+        .story-stats-panel:hover {
+          transform: translateY(-4px);
+          border-color: var(--color-gold);
         }
 
         .story-stats-panel h3 {
@@ -232,6 +256,12 @@ export default function About() {
           gap: 12px;
           font-size: 0.9rem;
           color: var(--text-light);
+          transition: var(--transition-smooth);
+        }
+
+        .capabilities-list li:hover {
+          transform: translateX(8px);
+          color: var(--text-white);
         }
 
         .cap-icon {
@@ -248,6 +278,12 @@ export default function About() {
 
         .mv-card {
           padding: 40px;
+          transition: var(--transition-smooth);
+        }
+
+        .mv-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--color-gold);
         }
 
         .mv-icon-wrapper {
@@ -298,6 +334,11 @@ export default function About() {
           color: var(--text-muted);
         }
 
+        .val-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--color-gold);
+        }
+
         /* Trust section */
         .trust-main-icon {
           color: var(--color-cyan);
@@ -322,6 +363,18 @@ export default function About() {
         .trust-point p {
           font-size: 0.85rem;
           color: var(--text-muted);
+        }
+
+        .trust-point {
+          padding: 20px;
+          background: rgba(255, 255, 255, 0.02);
+          border-radius: 8px;
+          transition: var(--transition-smooth);
+        }
+
+        .trust-point:hover {
+          background: rgba(197, 160, 89, 0.05);
+          transform: translateY(-4px);
         }
 
         @media (max-width: 991px) {

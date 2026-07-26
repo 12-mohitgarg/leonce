@@ -551,6 +551,11 @@ export default function Products() {
           transition: var(--transition-smooth);
         }
 
+        .product-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--color-gold);
+        }
+
         .product-card:hover .product-card-img {
           transform: scale(1.05);
         }
@@ -854,6 +859,16 @@ export default function Products() {
           .catalog-control-panel {
             flex-direction: column;
             align-items: flex-start;
+          }
+          .modal-grid {
+            gap: 20px;
+          }
+          .modal-visual-box {
+            width: 140px;
+            height: 140px;
+          }
+          .product-modal-container {
+            padding: 30px 20px;
           }
         }
       `}</style>

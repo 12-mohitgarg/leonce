@@ -185,5 +185,14 @@ const styleStyle = (
       color: var(--text-muted);
       line-height: 1.6;
     }
+
+    @media (max-width: 600px) {
+      .accordion-trigger h4 {
+        font-size: 0.9rem;
+      }
+      .accordion-panel p {
+        font-size: 0.85rem;
+      }
+    }
   `}</style>
 );

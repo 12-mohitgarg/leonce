@@ -147,6 +147,11 @@ const styleStyle = (
       line-height: 1.5;
     }
 
+    .metric-portfolio-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--color-gold);
+    }
+
     /* Case Studies */
     .case-studies-list {
       display: flex;
@@ -158,6 +163,12 @@ const styleStyle = (
     .case-card {
       padding: 40px;
       border-color: var(--border-glass-blue);
+      transition: var(--transition-smooth);
+    }
+
+    .case-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--color-gold);
     }
 
     .case-badge {
@@ -210,6 +221,14 @@ const styleStyle = (
       line-height: 1.5;
     }
 
+    .case-details-row > div {
+      transition: var(--transition-smooth);
+    }
+
+    .case-details-row > div:hover {
+      transform: translateX(8px);
+    }
+
     @media (max-width: 991px) {
       .portfolio-metrics-grid {
         grid-template-columns: 1fr 1fr;
@@ -223,6 +242,9 @@ const styleStyle = (
     @media (max-width: 600px) {
       .portfolio-metrics-grid {
         grid-template-columns: 1fr;
+      }
+      .case-card {
+        padding: 30px 20px;
       }
     }
   `}</style>

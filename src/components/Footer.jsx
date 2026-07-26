@@ -69,10 +69,6 @@ export default function Footer() {
                 <span>Leonce Multiventure, Suite 402, Technology Square, Mumbai, MH 400051, India</span>
               </li>
               <li>
-                <Phone size={18} className="contact-icon" />
-                <a href="tel:+912288884444">+91 22 8888 4444</a>
-              </li>
-              <li>
                 <Mail size={18} className="contact-icon" />
                 <a href="mailto:info@leonce-multiventure.com">info@leonce-multiventure.com</a>
               </li>

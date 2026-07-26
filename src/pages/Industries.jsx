@@ -142,6 +142,11 @@ export default function Industries() {
           line-height: 1.5;
         }
 
+        .industry-sector-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--color-gold);
+        }
+
         /* Center box */
         .center-cta-wrapper {
           text-align: center;
@@ -149,6 +154,12 @@ export default function Industries() {
           margin: 0 auto;
           padding: 40px;
           border-color: var(--border-glass-gold);
+          transition: var(--transition-smooth);
+        }
+
+        .center-cta-wrapper:hover {
+          transform: translateY(-4px);
+          box-shadow: var(--border-glow-gold);
         }
 
         .center-cta-wrapper h2 {
@@ -171,6 +182,9 @@ export default function Industries() {
         @media (max-width: 600px) {
           .industries-showcase-grid {
             grid-template-columns: 1fr;
+          }
+          .center-cta-wrapper {
+            padding: 30px 20px;
           }
         }
       `}</style>

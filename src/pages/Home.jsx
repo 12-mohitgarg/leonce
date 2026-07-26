@@ -95,6 +95,13 @@ export default function Home() {
           <div className="glowing-blob glowing-blob-gold" style={{ width: "650px", height: "650px", bottom: "-25%", right: "-15%" }}></div>
         </div>
 
+        {/* Floating Particles */}
+        <div className="particle" style={{ top: "20%", left: "10%", animationDelay: "0s" }}></div>
+        <div className="particle" style={{ top: "30%", right: "15%", animationDelay: "1s" }}></div>
+        <div className="particle" style={{ top: "60%", left: "20%", animationDelay: "2s" }}></div>
+        <div className="particle" style={{ top: "70%", right: "25%", animationDelay: "3s" }}></div>
+        <div className="particle" style={{ top: "40%", left: "40%", animationDelay: "4s" }}></div>
+
         {/* High-Tech Interactive Particle Canvas Background */}
         <TechParticleCanvas logoRef={logoWrapperRef} />
 
@@ -324,13 +331,6 @@ export default function Home() {
             </p>
             <div className="cta-contacts">
               <div className="cta-contact-item">
-                <Phone size={18} className="cta-icon" />
-                <div>
-                  <span>Direct Desk Line</span>
-                  <h4>+91 22 8888 4444</h4>
-                </div>
-              </div>
-              <div className="cta-contact-item">
                 <MessageSquare size={18} className="cta-icon" />
                 <div>
                   <span>Email Inquiries</span>
@@ -431,6 +431,12 @@ export default function Home() {
           text-align: center;
           padding: 40px;
           border-color: var(--border-glass-gold);
+          transition: var(--transition-smooth);
+        }
+
+        .intro-visual:hover {
+          transform: translateY(-4px);
+          box-shadow: var(--border-glow-gold);
         }
 
         .intro-years {
@@ -483,6 +489,18 @@ export default function Home() {
           color: var(--text-muted);
         }
 
+        .highlight-item {
+          transition: var(--transition-smooth);
+        }
+
+        .highlight-item:hover {
+          transform: translateX(8px);
+        }
+
+        .highlight-item:hover .hl-icon {
+          color: var(--color-gold-bright);
+        }
+
         /* Business Overview Card */
         .business-overview-grid {
           display: grid;
@@ -495,6 +513,12 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           gap: 15px;
+          transition: var(--transition-smooth);
+        }
+
+        .overview-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--color-gold);
         }
 
         .card-icon-wrapper {
@@ -562,6 +586,17 @@ export default function Home() {
           color: var(--text-muted);
         }
 
+        .cat-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--color-gold);
+        }
+
+        .cat-card:hover .cat-icon-container {
+          background: rgba(197, 160, 89, 0.1);
+          border-color: var(--color-gold);
+          color: var(--color-gold-bright);
+        }
+
         .center-actions {
           text-align: center;
           margin-top: 40px;
@@ -581,6 +616,19 @@ export default function Home() {
           display: flex;
           flex-direction: column;
           gap: 12px;
+        }
+
+        .bullets-list li {
+          position: relative;
+          padding-left: 24px;
+          font-size: 0.95rem;
+          color: var(--text-light);
+          transition: var(--transition-smooth);
+        }
+
+        .bullets-list li:hover {
+          transform: translateX(8px);
+          color: var(--text-white);
         }
 
         .bullets-list li {
@@ -606,6 +654,12 @@ export default function Home() {
         .counter-box {
           text-align: center;
           padding: 24px;
+          transition: var(--transition-smooth);
+        }
+
+        .counter-box:hover {
+          transform: translateY(-8px);
+          border-color: var(--color-gold);
         }
 
         .counter-val {
@@ -661,6 +715,16 @@ export default function Home() {
           max-width: 700px;
           margin: 0 auto;
           text-align: center;
+        }
+
+        .testimonial-card {
+          padding: 40px;
+          transition: var(--transition-smooth);
+        }
+
+        .testimonial-card:hover {
+          transform: translateY(-4px);
+          border-color: var(--color-gold);
         }
 
         .stars-row {
@@ -742,6 +806,15 @@ export default function Home() {
           display: flex;
           gap: 15px;
           align-items: center;
+          transition: var(--transition-smooth);
+        }
+
+        .cta-contact-item:hover {
+          transform: translateX(8px);
+        }
+
+        .cta-contact-item:hover .cta-icon {
+          color: var(--color-gold-bright);
         }
 
         .cta-icon {
@@ -776,6 +849,268 @@ export default function Home() {
           background: linear-gradient(180deg, var(--bg-dark-obsidian) 0%, var(--bg-deep-navy) 100%);
         }
 
+        /* Premium Card Animations */
+        .glass-card {
+          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+          transform: translateY(-6px);
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 225, 255, 0.1);
+        }
+
+        /* Icon Glow Animation */
+        .card-icon-wrapper,
+        .cat-icon-container {
+          transition: all 0.3s ease;
+        }
+
+        .glass-card:hover .card-icon-wrapper,
+        .glass-card:hover .cat-icon-container {
+          transform: scale(1.1);
+          filter: drop-shadow(0 0 15px rgba(0, 225, 255, 0.6));
+        }
+
+        /* Subtle Background Pulse */
+        .hero-banner::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          background: radial-gradient(circle at 50% 50%, rgba(0, 225, 255, 0.03) 0%, transparent 70%);
+          animation: subtlePulse 4s ease-in-out infinite;
+          pointer-events: none;
+        }
+
+        @keyframes subtlePulse {
+          0%, 100% {
+            opacity: 0.3;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.6;
+            transform: scale(1.1);
+          }
+        }
+
+        /* Smooth Fade In Animation */
+        .animate-on-scroll {
+          opacity: 0;
+          transform: translateY(30px);
+          transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .animate-on-scroll.is-visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        /* Counter Animation */
+        .counter-val {
+          background: linear-gradient(135deg, var(--color-cyan), var(--color-gold));
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+
+        /* Button Shine Effect */
+        .btn {
+          position: relative;
+          overflow: hidden;
+        }
+
+        .btn::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: -100%;
+          width: 100%;
+          height: 100%;
+          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+          transition: left 0.5s ease;
+        }
+
+        .btn:hover::before {
+          left: 100%;
+        }
+
+        /* Staggered Card Animations */
+        .overview-card:nth-child(1) {
+          animation: slideInUp 0.6s ease-out 0.1s both;
+        }
+        .overview-card:nth-child(2) {
+          animation: slideInUp 0.6s ease-out 0.2s both;
+        }
+        .overview-card:nth-child(3) {
+          animation: slideInUp 0.6s ease-out 0.3s both;
+        }
+
+        .cat-card:nth-child(1) {
+          animation: slideInUp 0.5s ease-out 0.1s both;
+        }
+        .cat-card:nth-child(2) {
+          animation: slideInUp 0.5s ease-out 0.15s both;
+        }
+        .cat-card:nth-child(3) {
+          animation: slideInUp 0.5s ease-out 0.2s both;
+        }
+        .cat-card:nth-child(4) {
+          animation: slideInUp 0.5s ease-out 0.25s both;
+        }
+
+        @keyframes slideInUp {
+          from {
+            opacity: 0;
+            transform: translateY(40px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        /* Hero Text Reveal Animation */
+        .hero-badge {
+          animation: fadeInDown 0.8s ease-out 0.3s both;
+        }
+
+        .hero-title {
+          animation: fadeInUp 1s ease-out 0.5s both;
+        }
+
+        .hero-desc {
+          animation: fadeInUp 1s ease-out 0.7s both;
+        }
+
+        .hero-actions {
+          animation: fadeInUp 1s ease-out 0.9s both;
+        }
+
+        @keyframes fadeInDown {
+          from {
+            opacity: 0;
+            transform: translateY(-30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(30px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        /* Floating Particles in Hero */
+        .particle {
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          background: var(--color-cyan);
+          border-radius: 50%;
+          animation: floatParticle 8s ease-in-out infinite;
+        }
+
+        @keyframes floatParticle {
+          0%, 100% {
+            transform: translate(0, 0) scale(1);
+            opacity: 0.3;
+          }
+          25% {
+            transform: translate(30px, -30px) scale(1.5);
+            opacity: 0.6;
+          }
+          50% {
+            transform: translate(-20px, -50px) scale(1);
+            opacity: 0.4;
+          }
+          75% {
+            transform: translate(40px, -20px) scale(1.3);
+            opacity: 0.7;
+          }
+        }
+
+        /* Glow Effect on Scroll */
+        .section-header {
+          animation: glowPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+          0%, 100% {
+            filter: drop-shadow(0 0 0 transparent);
+          }
+          50% {
+            filter: drop-shadow(0 0 20px rgba(197, 160, 89, 0.3));
+          }
+        }
+
+        /* Counter Box Stagger */
+        .counter-box:nth-child(1) {
+          animation: scaleIn 0.5s ease-out 0.1s both;
+        }
+        .counter-box:nth-child(2) {
+          animation: scaleIn 0.5s ease-out 0.2s both;
+        }
+        .counter-box:nth-child(3) {
+          animation: scaleIn 0.5s ease-out 0.3s both;
+        }
+        .counter-box:nth-child(4) {
+          animation: scaleIn 0.5s ease-out 0.4s both;
+        }
+
+        @keyframes scaleIn {
+          from {
+            opacity: 0;
+            transform: scale(0.8);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+
+        /* Industry Card Hover Glow */
+        .industry-card {
+          position: relative;
+        }
+
+        .industry-card::before {
+          content: '';
+          position: absolute;
+          top: -2px;
+          left: -2px;
+          right: -2px;
+          bottom: -2px;
+          background: linear-gradient(45deg, var(--color-cyan), var(--color-gold), var(--color-cyan));
+            border-radius: inherit;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .industry-card:hover::before {
+          opacity: 1;
+            animation: borderRotate 2s linear infinite;
+        }
+
+        @keyframes borderRotate {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+
         /* Media Queries */
         @media (max-width: 991px) {
           .hero-grid, .intro-grid, .stats-grid, .cta-grid {
@@ -783,10 +1118,10 @@ export default function Home() {
             gap: 40px;
           }
           .hero-text-content {
-            text-align: center;
+            text-align: left;
           }
           .hero-actions {
-            justify-content: center;
+            justify-content: flex-start;
           }
           .hero-title {
             font-size: 2.75rem;

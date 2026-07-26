@@ -124,6 +124,11 @@ export default function QualityAssurance() {
           line-height: 1.5;
         }
 
+        .qa-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--color-gold);
+        }
+
         /* Metric Highlights */
         .qa-metric-grid {
           display: grid;
@@ -137,12 +142,33 @@ export default function QualityAssurance() {
           margin-bottom: 20px;
         }
 
+        .qa-metric-text p {
+          font-size: 0.95rem;
+          color: var(--text-muted);
+          line-height: 1.6;
+        }
+
+        .qa-metric-text {
+          transition: var(--transition-smooth);
+        }
+
+        .qa-metric-text:hover {
+          transform: translateX(8px);
+        }
+
         .qa-metric-panel {
           border-color: var(--border-glass-blue);
           padding: 40px;
           display: flex;
           align-items: center;
           justify-content: center;
+          transition: var(--transition-smooth);
+        }
+
+        .qa-metric-panel:hover {
+          transform: translateY(-4px);
+          border-color: var(--color-gold);
+          box-shadow: var(--border-glow-gold);
         }
 
         .percentage-circle {
@@ -187,6 +213,19 @@ export default function QualityAssurance() {
         @media (max-width: 600px) {
           .qa-showcase-grid {
             grid-template-columns: 1fr;
+          }
+          .qa-metric-grid {
+            gap: 30px;
+          }
+          .qa-metric-panel {
+            padding: 30px 20px;
+          }
+          .percentage-circle {
+            width: 150px;
+            height: 150px;
+          }
+          .percentage {
+            font-size: 2rem;
           }
         }
       `}</style>

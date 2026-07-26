@@ -192,6 +192,11 @@ const styleStyle = (
       line-height: 1.4;
     }
 
+    .gallery-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--color-gold);
+    }
+
     @media (max-width: 991px) {
       .gallery-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -201,6 +206,13 @@ const styleStyle = (
     @media (max-width: 600px) {
       .gallery-grid {
         grid-template-columns: 1fr;
+      }
+      .gallery-tabs-row {
+        gap: 8px;
+      }
+      .gallery-tab-btn {
+        font-size: 0.75rem;
+        padding: 8px 12px;
       }
     }
   `}</style>

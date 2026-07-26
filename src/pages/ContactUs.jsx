@@ -9,11 +9,6 @@ export default function ContactUs() {
       details: "Leonce Multiventure, Suite 402, Technology Square, Mumbai, MH 400051, India"
     },
     {
-      icon: <Phone className="contact-card-icon" />,
-      title: "Procurement Desk Line",
-      details: "+91 22 8888 4444"
-    },
-    {
       icon: <Mail className="contact-card-icon" />,
       title: "Direct email Inquiries",
       details: "info@leonce-multiventure.com"
@@ -181,6 +176,11 @@ const styleStyle = (
       color: var(--text-muted);
     }
 
+    .contact-detail-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--color-gold);
+    }
+
     /* Social row */
     .socials-contact-block h4 {
       font-size: 0.9rem;
@@ -221,6 +221,11 @@ const styleStyle = (
       position: relative;
       background: linear-gradient(135deg, #090f23 0%, #03050c 100%);
       overflow: hidden;
+      transition: var(--transition-smooth);
+    }
+
+    .mock-maps-container:hover {
+      box-shadow: var(--border-glow-gold);
     }
 
     .mock-maps-grid-overlay {
@@ -253,6 +258,12 @@ const styleStyle = (
       max-width: 280px;
       box-shadow: var(--shadow-premium);
       z-index: 20;
+      transition: var(--transition-smooth);
+    }
+
+    .mock-maps-popup:hover {
+      transform: translateY(-4px);
+      border-color: var(--color-gold);
     }
 
     .mock-maps-popup h4 {
@@ -287,6 +298,18 @@ const styleStyle = (
       .contact-main-grid {
         grid-template-columns: 1fr;
         gap: 40px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .contact-detail-card {
+        padding: 15px;
+      }
+      .contact-social-row {
+        flex-wrap: wrap;
+      }
+      .mock-maps-container {
+        height: 300px;
       }
     }
   `}</style>

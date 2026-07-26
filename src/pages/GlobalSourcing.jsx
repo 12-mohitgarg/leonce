@@ -210,6 +210,12 @@ export default function GlobalSourcing() {
           color: var(--text-light);
           position: relative;
           padding-left: 20px;
+          transition: var(--transition-smooth);
+        }
+
+        .sourcing-locations-list li:hover {
+          transform: translateX(8px);
+          color: var(--text-white);
         }
 
         .sourcing-locations-list li::before {
@@ -262,10 +268,21 @@ export default function GlobalSourcing() {
           line-height: 1.5;
         }
 
+        .sourcing-step-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--color-gold);
+        }
+
         /* Vendor Policy Box */
         .vendor-policy-box {
           border-color: var(--border-glass-gold);
           padding: 40px;
+          transition: var(--transition-smooth);
+        }
+
+        .vendor-policy-box:hover {
+          transform: translateY(-4px);
+          box-shadow: var(--border-glow-gold);
         }
 
         .policy-icon-wrapper {
@@ -299,6 +316,14 @@ export default function GlobalSourcing() {
           line-height: 1.5;
         }
 
+        .crit-item {
+          transition: var(--transition-smooth);
+        }
+
+        .crit-item:hover {
+          transform: translateX(8px);
+        }
+
         @media (max-width: 991px) {
           .map-grid {
             grid-template-columns: 1fr;
@@ -314,6 +339,15 @@ export default function GlobalSourcing() {
         @media (max-width: 600px) {
           .sourcing-steps-grid {
             grid-template-columns: 1fr;
+          }
+          .map-grid {
+            gap: 30px;
+          }
+          .map-graphics-panel {
+            height: 280px;
+          }
+          .vector-world-map {
+            transform: scale(0.8);
           }
         }
       `}</style>

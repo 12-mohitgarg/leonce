@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import FloatingActions from "./components/FloatingActions";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Loader from "./components/Loader";
 
 // Pages
 import Home from "./pages/Home";
@@ -60,6 +61,7 @@ function ScrollToTop() {
 export default function App() {
   return (
     <Router>
+      <Loader />
       <ScrollToTop />
       <div className="app-layout">
         <Navbar />

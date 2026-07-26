@@ -125,6 +125,11 @@ const styleStyle = (
       line-height: 1.5;
     }
 
+    .cert-card:hover {
+      transform: translateY(-8px);
+      border-color: var(--color-gold);
+    }
+
     @media (max-width: 991px) {
       .certs-grid {
         grid-template-columns: 1fr 1fr;

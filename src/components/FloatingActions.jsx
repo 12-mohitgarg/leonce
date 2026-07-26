@@ -3,7 +3,6 @@ import { MessageCircle, PhoneCall } from "lucide-react";
 
 export default function FloatingActions() {
   const whatsappNumber = "+919876543210"; // Sample WhatsApp number
-  const phoneNumber = "+912288884444";
   const whatsappMessage = encodeURIComponent(
     "Hello Leonce Multiventure team, we would like to inquire about bulk importing PCBA & router devices."
   );

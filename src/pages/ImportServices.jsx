@@ -184,6 +184,11 @@ export default function ImportServices() {
           line-height: 1.5;
         }
 
+        .service-card:hover {
+          transform: translateY(-8px);
+          border-color: var(--color-gold);
+        }
+
         /* Supply flow pipeline */
         .flow-grid {
           display: grid;
@@ -208,6 +213,16 @@ export default function ImportServices() {
           display: flex;
           gap: 20px;
           align-items: flex-start;
+          transition: var(--transition-smooth);
+        }
+
+        .step-row:hover {
+          transform: translateX(8px);
+        }
+
+        .step-row:hover .step-num {
+          background: rgba(197, 160, 89, 0.15);
+          border-color: var(--color-gold);
         }
 
         .step-num {
@@ -241,6 +256,12 @@ export default function ImportServices() {
           border-color: var(--border-glass-gold);
           padding: 40px;
           text-align: center;
+          transition: var(--transition-smooth);
+        }
+
+        .flow-cta-panel:hover {
+          transform: translateY(-4px);
+          box-shadow: var(--border-glow-gold);
         }
 
         .flow-cta-panel h3 {
@@ -266,6 +287,12 @@ export default function ImportServices() {
         @media (max-width: 600px) {
           .services-showcase-grid {
             grid-template-columns: 1fr;
+          }
+          .flow-grid {
+            gap: 30px;
+          }
+          .flow-cta-panel {
+            padding: 30px 20px;
           }
         }
       `}</style>

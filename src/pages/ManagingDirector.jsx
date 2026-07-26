@@ -259,6 +259,15 @@ export default function ManagingDirector() {
           display: flex;
           gap: 15px;
           align-items: flex-start;
+          transition: var(--transition-smooth);
+        }
+
+        .v-bullet:hover {
+          transform: translateX(8px);
+        }
+
+        .v-bullet:hover .v-bullet-icon {
+          color: var(--color-gold-bright);
         }
 
         .v-bullet-icon {
@@ -318,9 +327,34 @@ export default function ManagingDirector() {
           color: var(--text-muted);
         }
 
+        .md-photo-panel:hover {
+          transform: translateY(-4px);
+          box-shadow: var(--border-glow-gold);
+        }
+
         @media (max-width: 991px) {
           .md-grid {
             grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 600px) {
+          .md-photo-panel {
+            padding: 30px 20px;
+          }
+          .md-avatar-container {
+            width: 150px;
+            height: 150px;
+          }
+          .md-avatar-icon {
+            width: 100px;
+            height: 100px;
+          }
+          .quote-intro h2 {
+            font-size: 1.3rem;
+          }
+          .signature-container {
+            max-width: 100%;
           }
         }
       `}</style>
