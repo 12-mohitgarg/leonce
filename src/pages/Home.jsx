@@ -54,6 +54,7 @@ function CountUp({ end, duration = 2000, suffix = "" }) {
 }
 
 export default function Home() {
+  const logoWrapperRef = useRef(null);
   const [activeTestimonial, setActiveTestimonial] = useState(0);
 
   const testimonials = [
@@ -87,8 +88,17 @@ export default function Home() {
   return (
     <div className="home-page">
       {/* 1. HERO BANNER SECTION */}
-      <section className="hero-banner">
-        <div className="hero-grid container">
+      <section className="hero-banner" style={{ position: "relative", overflow: "hidden" }}>
+        {/* Premium Background Glowing Blobs */}
+        <div className="glowing-blob-container">
+          <div className="glowing-blob glowing-blob-blue" style={{ width: "550px", height: "550px", top: "-15%", left: "-15%" }}></div>
+          <div className="glowing-blob glowing-blob-gold" style={{ width: "650px", height: "650px", bottom: "-25%", right: "-15%" }}></div>
+        </div>
+
+        {/* High-Tech Interactive Particle Canvas Background */}
+        <TechParticleCanvas logoRef={logoWrapperRef} />
+
+        <div className="hero-grid container" style={{ position: "relative", zIndex: 1 }}>
           <div className="hero-text-content">
             <span className="hero-badge">Technology Importer &amp; Distributor</span>
             <h1 className="hero-title">
@@ -108,7 +118,7 @@ export default function Home() {
             </div>
           </div>
           <div className="hero-visual-content">
-            <div className="hero-logo-glowing-wrapper">
+            <div ref={logoWrapperRef} className="hero-logo-glowing-wrapper">
               <InteractiveLogo width="90%" animate={true} />
             </div>
           </div>
@@ -822,3 +832,712 @@ function LayersIcon() {
     </svg>
   );
 }
+
+// High-Tech Interactive Canvas Background Component (Executive Cyber 3D Globe, Glass Panels & HUD Scriptor Matrix)
+function TechParticleCanvas({ logoRef }) {
+  const canvasRef = useRef(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    let animationFrameId;
+    
+    let brainNodes = [];
+    let particles = [];
+    let shapes = [];
+    let binaryRain = [];
+    let pcbTracks = [];
+    let hexClusters = [];
+    
+    let time = 0;
+    const focalLength = 320;
+    let camAngleX = 0;
+    let camAngleY = 0;
+    const mouse = { x: null, y: null };
+
+    const resizeCanvas = () => {
+      canvas.width = canvas.offsetWidth;
+      canvas.height = canvas.offsetHeight;
+      
+      initBrainNodes();
+      initParticles();
+      initGlassPanels();
+      initBinaryRain();
+      initPCBTracks();
+      initHexClusters();
+    };
+
+    // 3D rotation helpers
+    const rotateX = (x, y, z, angle) => {
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      return {
+        x,
+        y: y * cos - z * sin,
+        z: y * sin + z * cos
+      };
+    };
+
+    const rotateY = (x, y, z, angle) => {
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      return {
+        x: x * cos - z * sin,
+        y,
+        z: x * sin + z * cos
+      };
+    };
+
+    const rotateZ = (x, y, z, angle) => {
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      return {
+        x: x * cos - y * sin,
+        y: x * sin + y * cos,
+        z
+      };
+    };
+
+    const initBrainNodes = () => {
+      brainNodes = [];
+      const nodeCount = 260; // Thousands/hundreds of particles forming the brain
+      const baseRadius = Math.min(canvas.width, canvas.height) * 0.12;
+
+      for (let i = 0; i < nodeCount; i++) {
+        // Generate coordinates on a wrinkled sphere model represent brain shape
+        const phi = Math.acos(1 - 2 * (i + 0.5) / nodeCount);
+        const theta = Math.PI * (1 + Math.sqrt(5)) * (i + 0.5);
+
+        const r = baseRadius * (1 + 0.16 * Math.sin(6 * theta) * Math.sin(5 * phi) + 0.05 * Math.sin(18 * phi));
+        
+        let tx = Math.cos(theta) * Math.sin(phi) * r;
+        let ty = Math.sin(theta) * Math.sin(phi) * r * 0.85; // slightly flattened vertically
+        let tz = Math.cos(phi) * r * 1.15;              // elongated front-to-back
+
+        // Separate into left and right hemispheres (longitudinal fissure)
+        const hemisphere = tx > 0 ? 1 : -1;
+        tx += hemisphere * 4.5;
+
+        brainNodes.push({
+          startX: (Math.random() - 0.5) * 1000,
+          startY: (Math.random() - 0.5) * 800,
+          startZ: (Math.random() - 0.5) * 800,
+          targetX: tx,
+          targetY: ty,
+          targetZ: tz,
+          color: Math.random() < 0.72 ? "rgba(0, 225, 255," : "rgba(197, 160, 89,"
+        });
+      }
+    };
+
+    const initParticles = () => {
+      particles = [];
+      const particleCount = canvas.width < 768 ? 40 : 100; // Spark particles
+      for (let i = 0; i < particleCount; i++) {
+        particles.push({
+          x: (Math.random() - 0.5) * 700,
+          y: (Math.random() - 0.5) * 500,
+          z: (Math.random() - 0.5) * 500,
+          speed: Math.random() * 0.25 + 0.1,
+          angleOffset: Math.random() * Math.PI * 2,
+          size: Math.random() * 0.7 + 0.35,
+          color: Math.random() < 0.65 ? "rgba(0, 225, 255," : "rgba(168, 85, 247,"
+        });
+      }
+    };
+
+    const initGlassPanels = () => {
+      const panelVerts = [
+        { x: -50, y: -30, z: 0 },
+        { x: 50, y: -30, z: 0 },
+        { x: 50, y: 30, z: 0 },
+        { x: -50, y: 30, z: 0 }
+      ];
+      
+      const cpuVerts = [
+        { x: -16, y: -16, z: 0 }, { x: 16, y: -16, z: 0 }, { x: 16, y: 16, z: 0 }, { x: -16, y: 16, z: 0 }
+      ];
+      const cpuEdges = [[0, 1], [1, 2], [2, 3], [3, 0]];
+
+      shapes = [
+        {
+          type: "glass",
+          vertices: panelVerts,
+          offsetX: -240,
+          offsetY: -80,
+          offsetZ: 40,
+          rotX: 0.1, rotY: -0.2, rotZ: 0.05,
+          speedY: 0.002, speedZ: 0.001
+        },
+        {
+          type: "cpu",
+          vertices: cpuVerts,
+          edges: cpuEdges,
+          offsetX: 170,
+          offsetY: -110,
+          offsetZ: 20,
+          rotX: 0.004, rotY: 0.008, rotZ: 0.002,
+          speedY: 0.003, speedZ: 0.005
+        },
+        {
+          type: "cpu",
+          vertices: cpuVerts,
+          edges: cpuEdges,
+          offsetX: 190,
+          offsetY: 90,
+          offsetZ: -30,
+          rotX: 0.005, rotY: 0.002, rotZ: 0.007,
+          speedY: 0.004, speedZ: 0.001
+        }
+      ];
+    };
+
+    const initBinaryRain = () => {
+      binaryRain = [];
+      const colWidth = 32;
+      const colCount = Math.floor(canvas.width / colWidth);
+      for (let i = 0; i < colCount; i += 6) {
+        const chars = [];
+        const length = Math.floor(Math.random() * 4) + 3;
+        for (let j = 0; j < length; j++) {
+          chars.push(Math.random() < 0.5 ? "0" : "1");
+        }
+        binaryRain.push({
+          x: i * colWidth + Math.random() * 6,
+          y: Math.random() * -canvas.height,
+          speed: Math.random() * 1.0 + 0.6,
+          chars
+        });
+      }
+    };
+
+    const initPCBTracks = () => {
+      pcbTracks = [];
+      pcbTracks.push({
+        points: [{ x: 50, y: 160 }, { x: 180, y: 160 }, { x: 210, y: 190 }],
+        pulse: 0,
+        color: "rgba(0, 225, 255,"
+      });
+    };
+
+    const initHexClusters = () => {
+      hexClusters = [];
+      const count = 3;
+      for (let k = 0; k < count; k++) {
+        hexClusters.push({
+          x: Math.random() * (canvas.width - 200) + 100,
+          y: Math.random() * (canvas.height - 200) + 100,
+          size: Math.random() * 18 + 12,
+          alpha: 0,
+          targetAlpha: Math.random() * 0.12 + 0.03,
+          speed: Math.random() * 0.004 + 0.002
+        });
+      }
+    };
+
+    const handleMouseMove = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - rect.left;
+      mouse.y = e.clientY - rect.top;
+    };
+
+    const handleMouseLeave = () => {
+      mouse.x = null;
+      mouse.y = null;
+    };
+
+    const parent = canvas.parentElement;
+    if (parent) {
+      parent.addEventListener("mousemove", handleMouseMove);
+      parent.addEventListener("mouseleave", handleMouseLeave);
+    }
+
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+
+    const draw = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      const centerX = canvas.width / 2;
+      const centerY = canvas.height / 2;
+      time += 0.024;
+
+      // Determine logo center coordinates
+      let logoX = null;
+      let logoY = null;
+      if (logoRef && logoRef.current) {
+        const logoRect = logoRef.current.getBoundingClientRect();
+        const canvasRect = canvas.getBoundingClientRect();
+        logoX = logoRect.left - canvasRect.left + logoRect.width / 2;
+        logoY = logoRect.top - canvasRect.top + logoRect.height / 2;
+      }
+
+      const brainCenterX = logoX !== null ? logoX : (centerX + 260);
+      const brainCenterY = logoY !== null ? logoY : (centerY - 60);
+
+      // Shifting background metallic gradients
+      const purpleGlowX = centerX + Math.sin(time * 0.1) * 160;
+      const purpleGlowY = centerY + Math.cos(time * 0.12) * 120;
+      const purpleGlow = ctx.createRadialGradient(purpleGlowX, purpleGlowY, 0, purpleGlowX, purpleGlowY, 440);
+      purpleGlow.addColorStop(0, "rgba(168, 85, 247, 0.035)");
+      purpleGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = purpleGlow;
+      ctx.beginPath();
+      ctx.arc(purpleGlowX, purpleGlowY, 440, 0, Math.PI * 2);
+      ctx.fill();
+
+      const cyanGlowX = centerX - Math.cos(time * 0.08) * 190;
+      const cyanGlowY = centerY - Math.sin(time * 0.14) * 80;
+      const cyanGlow = ctx.createRadialGradient(cyanGlowX, cyanGlowY, 0, cyanGlowX, cyanGlowY, 400);
+      cyanGlow.addColorStop(0, "rgba(0, 225, 255, 0.035)");
+      cyanGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+      ctx.fillStyle = cyanGlow;
+      ctx.beginPath();
+      ctx.arc(cyanGlowX, cyanGlowY, 400, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Parallax camera tilt angles
+      const targetAngleX = mouse.x !== null ? (mouse.y - centerY) * 0.0004 : 0;
+      const targetAngleY = mouse.x !== null ? (mouse.x - centerX) * 0.0004 : 0;
+      
+      camAngleX += (targetAngleX - camAngleX) * 0.05;
+      camAngleY += (targetAngleY - camAngleY) * 0.05;
+
+      const finalAngleX = camAngleX + Math.sin(time * 0.08) * 0.015;
+      const finalAngleY = camAngleY + time * 0.0015;
+
+      // 1. Digital Brain Self-Assembly & Pulsating Render
+      const assemblyProgress = Math.min(1.0, time / 6.0);
+      const easeAssembly = 1 - Math.pow(1 - assemblyProgress, 3); // easeOutCubic
+
+      const brainPulse = assemblyProgress >= 1.0 ? 1.0 + 0.035 * Math.sin(time * 1.8) : 1.0;
+
+      const brainProjected = brainNodes.map((p) => {
+        // Interpolate between start and wrinkled target positions
+        let x = p.startX + (p.targetX - p.startX) * easeAssembly;
+        let y = p.startY + (p.targetY - p.startY) * easeAssembly;
+        let z = p.startZ + (p.targetZ - p.startZ) * easeAssembly;
+
+        x *= brainPulse;
+        y *= brainPulse;
+        z *= brainPulse;
+
+        // Apply mouse particle attraction bend
+        if (mouse.x !== null && mouse.y !== null) {
+          const absoluteX = brainCenterX + x;
+          const absoluteY = brainCenterY + y;
+          const dx = mouse.x - absoluteX;
+          const dy = mouse.y - absoluteY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 140) {
+            const pull = (1 - dist / 140) * 8.0;
+            x += (dx / Math.max(1, dist)) * pull;
+            y += (dy / Math.max(1, dist)) * pull;
+          }
+        }
+
+        // Apply rotation matrices
+        let r = rotateY(x, y, z, finalAngleY * 0.6);
+        r = rotateX(r.x, r.y, r.z, finalAngleX);
+
+        // Safe focal division denominator
+        const scale = focalLength / Math.max(1, r.z + focalLength);
+
+        return {
+          screenX: brainCenterX + r.x * scale,
+          screenY: brainCenterY + r.y * scale,
+          depthZ: r.z,
+          color: p.color,
+          scale
+        };
+      });
+
+      // Render synapses (faint lines between close nodes in the brain)
+      ctx.save();
+      ctx.lineWidth = 0.5;
+      const connectionDist = 18;
+      for (let i = 0; i < brainProjected.length; i += 4) {
+        const p1 = brainProjected[i];
+        for (let j = i + 1; j < brainProjected.length; j += 6) {
+          const p2 = brainProjected[j];
+          const dx = p1.screenX - p2.screenX;
+          const dy = p1.screenY - p2.screenY;
+          const d = Math.sqrt(dx*dx + dy*dy);
+          if (d < connectionDist) {
+            ctx.strokeStyle = "rgba(0, 225, 255, " + (0.05 * Math.min(p1.scale, p2.scale)) + ")";
+            ctx.beginPath();
+            ctx.moveTo(p1.screenX, p1.screenY);
+            ctx.lineTo(p2.screenX, p2.screenY);
+            ctx.stroke();
+          }
+        }
+      }
+      ctx.restore();
+
+      // Render brain particles
+      brainProjected.sort((a, b) => b.depthZ - a.depthZ);
+      for (let i = 0; i < brainProjected.length; i++) {
+        const pt = brainProjected[i];
+        ctx.beginPath();
+        const rawSize = pt.depthZ <= 0 ? 1.5 * pt.scale : 0.8 * pt.scale;
+        const size = Math.max(0.1, rawSize);
+        ctx.arc(pt.screenX, pt.screenY, size, 0, Math.PI * 2);
+        const opacity = pt.depthZ <= 0 ? 0.45 : 0.12;
+        ctx.fillStyle = pt.color + (opacity * pt.scale) + ")";
+        ctx.fill();
+      }
+
+      // 2. Faint sweeping laser scan planes
+      ctx.save();
+      const laserY = (time * 80) % (canvas.height + 400) - 200;
+      const laserGrad = ctx.createLinearGradient(0, laserY, 0, laserY + 14);
+      laserGrad.addColorStop(0, "rgba(0, 225, 255, 0)");
+      laserGrad.addColorStop(0.5, "rgba(0, 225, 255, 0.04)");
+      laserGrad.addColorStop(1, "rgba(0, 225, 255, 0)");
+      ctx.fillStyle = laserGrad;
+      ctx.fillRect(0, laserY, canvas.width, 14);
+      ctx.restore();
+
+      // 3. Conformal background coordinate grid
+      ctx.save();
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.007)";
+      ctx.lineWidth = 0.5;
+      const spacing = 80;
+      ctx.beginPath();
+      for (let x = spacing; x < canvas.width; x += spacing) {
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, canvas.height);
+      }
+      for (let y = spacing; y < canvas.height; y += spacing) {
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+      }
+      ctx.stroke();
+      ctx.restore();
+
+      // 4. Binary code rain columns
+      ctx.save();
+      ctx.font = "8px monospace";
+      for (let i = 0; i < binaryRain.length; i++) {
+        const drop = binaryRain[i];
+        drop.y += drop.speed;
+        if (drop.y > canvas.height) {
+          drop.y = -80;
+          drop.x = Math.random() * canvas.width;
+        }
+
+        for (let j = 0; j < drop.chars.length; j++) {
+          const cy = drop.y - j * 12;
+          if (cy >= 0 && cy <= canvas.height) {
+            const alpha = (1 - j / drop.chars.length) * 0.04;
+            ctx.fillStyle = "rgba(0, 225, 255, " + alpha + ")";
+            ctx.fillText(drop.chars[j], drop.x, cy);
+          }
+        }
+      }
+      ctx.restore();
+
+      // 5. Drifting spark micro-particles
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        const flowAngle = time * 0.3 + p.angleOffset;
+        p.x += Math.sin(flowAngle) * p.speed + 0.12;
+        p.y += Math.cos(flowAngle) * p.speed - p.speed * 0.08;
+        
+        if (p.y < -300) p.y = 300;
+        if (p.x > 400) p.x = -400;
+
+        if (mouse.x !== null && mouse.y !== null) {
+          const dx = mouse.x - (centerX + p.x);
+          const dy = mouse.y - (centerY + p.y);
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          if (dist < 180) {
+            const pull = (1 - dist / 180) * 0.12;
+            p.x += (dx / Math.max(1, dist)) * pull;
+            p.y += (dy / Math.max(1, dist)) * pull;
+          }
+        }
+
+        let rotated = rotateY(p.x, p.y, p.z, finalAngleY);
+        rotated = rotateX(rotated.x, rotated.y, rotated.z, finalAngleX);
+
+        const pZ = rotated.z + focalLength;
+        const scale = focalLength / Math.max(1, pZ);
+        const px = centerX + rotated.x * scale;
+        const py = centerY + rotated.y * scale;
+
+        ctx.beginPath();
+        ctx.arc(px, py, Math.max(0.1, p.size * scale), 0, Math.PI * 2);
+        ctx.fillStyle = p.color + (0.32 * Math.min(1.0, scale)) + ")";
+        ctx.fill();
+      }
+
+      // 6. Holographic Calibration circles framing the brain
+      ctx.save();
+      ctx.strokeStyle = "rgba(0, 225, 255, 0.05)";
+      ctx.lineWidth = 0.75;
+      const calibrationRadii = [70, 115, 165];
+      calibrationRadii.forEach((r, idx) => {
+        ctx.beginPath();
+        ctx.arc(brainCenterX, brainCenterY, r, 0, Math.PI * 2);
+        ctx.stroke();
+
+        if (idx === 1) {
+          ctx.strokeStyle = "rgba(0, 225, 255, 0.1)";
+          for (let a = 0; a < Math.PI * 2; a += Math.PI / 10) {
+            const rotA = a + time * 0.02;
+            ctx.beginPath();
+            ctx.moveTo(brainCenterX + Math.cos(rotA) * (r - 4), brainCenterY + Math.sin(rotA) * (r - 4));
+            ctx.lineTo(brainCenterX + Math.cos(rotA) * r, brainCenterY + Math.sin(rotA) * r);
+            ctx.stroke();
+          }
+        }
+      });
+      ctx.restore();
+
+      // 7. Render shapes (rotating 3D wireframe chips and panels)
+      for (let sIdx = 0; sIdx < shapes.length; sIdx++) {
+        const shape = shapes[sIdx];
+        
+        if (shape.speedX) shape.rotX += shape.speedX;
+        shape.rotY += shape.speedY;
+        shape.rotZ += shape.speedZ;
+
+        const shapeProjected = [];
+
+        for (let vIdx = 0; vIdx < shape.vertices.length; vIdx++) {
+          const vert = shape.vertices[vIdx];
+          
+          let v = rotateX(vert.x, vert.y, vert.z, shape.rotX);
+          v = rotateY(v.x, v.y, v.z, shape.rotY);
+          v = rotateZ(v.x, v.y, v.z, shape.rotZ);
+          
+          const wx = v.x + shape.offsetX;
+          const wy = v.y + shape.offsetY;
+          const wz = v.z + shape.offsetZ;
+
+          let r = rotateY(wx, wy, wz, finalAngleY);
+          r = rotateX(r.x, r.y, r.z, finalAngleX);
+
+          const pZ = r.z + focalLength;
+          const scale = focalLength / Math.max(1, pZ);
+
+          shapeProjected.push({
+            x: centerX + r.x * scale,
+            y: centerY + r.y * scale,
+            scale
+          });
+        }
+
+        const avgScale = shapeProjected.reduce((sum, pt) => sum + pt.scale, 0) / shapeProjected.length;
+
+        if (shape.type === "glass") {
+          ctx.beginPath();
+          ctx.moveTo(shapeProjected[0].x, shapeProjected[0].y);
+          for (let j = 1; j < shapeProjected.length; j++) {
+            ctx.lineTo(shapeProjected[j].x, shapeProjected[j].y);
+          }
+          ctx.closePath();
+
+          const panelGrad = ctx.createLinearGradient(
+            shapeProjected[0].x, shapeProjected[0].y, 
+            shapeProjected[2].x, shapeProjected[2].y
+          );
+          panelGrad.addColorStop(0, "rgba(255, 255, 255, 0.015)");
+          panelGrad.addColorStop(1, "rgba(0, 225, 255, 0.005)");
+          ctx.fillStyle = panelGrad;
+          ctx.fill();
+
+          let lineAlpha = 0.065;
+          if (mouse.x !== null && mouse.y !== null) {
+            const mDist = Math.sqrt((shapeProjected[0].x - mouse.x)*(shapeProjected[0].x - mouse.x) + (shapeProjected[0].y - mouse.y)*(shapeProjected[0].y - mouse.y));
+            if (mDist < 130) lineAlpha = 0.065 + (1 - mDist / 130) * 0.18;
+          }
+
+          ctx.strokeStyle = "rgba(0, 225, 255, " + (lineAlpha * avgScale) + ")";
+          ctx.lineWidth = 0.8;
+          ctx.stroke();
+
+          ctx.save();
+          ctx.clip();
+          
+          const sheenX = (time * 150) % (canvas.width + 400) - 200;
+          const sheenGrad = ctx.createLinearGradient(sheenX, 0, sheenX + 60, 0);
+          sheenGrad.addColorStop(0, "rgba(255, 255, 255, 0)");
+          sheenGrad.addColorStop(0.5, "rgba(255, 255, 255, 0.038)");
+          sheenGrad.addColorStop(1, "rgba(255, 255, 255, 0)");
+          
+          ctx.fillStyle = sheenGrad;
+          ctx.fillRect(-canvas.width, -canvas.height, canvas.width * 3, canvas.height * 3);
+          ctx.restore();
+        } else {
+          ctx.save();
+          ctx.lineWidth = 0.75;
+          ctx.strokeStyle = "rgba(0, 225, 255, " + (0.16 * avgScale) + ")";
+          
+          for (let eIdx = 0; eIdx < shape.edges.length; eIdx++) {
+            const edge = shape.edges[eIdx];
+            const p1 = shapeProjected[edge[0]];
+            const p2 = shapeProjected[edge[1]];
+
+            if (p1 && p2) {
+              ctx.beginPath();
+              ctx.moveTo(p1.x, p1.y);
+              ctx.lineTo(p2.x, p2.y);
+              ctx.stroke();
+            }
+          }
+          ctx.restore();
+
+          for (let vIdx = 0; vIdx < shapeProjected.length; vIdx++) {
+            const pt = shapeProjected[vIdx];
+            ctx.beginPath();
+            ctx.arc(pt.x, pt.y, Math.max(0.1, 1.0 * pt.scale), 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(168, 85, 247, " + (0.35 * pt.scale) + ")";
+            ctx.fill();
+          }
+
+          // Circuit routing pathway from brain center to outer technology shapes
+          const iconCenterX = shapeProjected.reduce((sum, pt) => sum + pt.x, 0) / shapeProjected.length;
+          const iconCenterY = shapeProjected.reduce((sum, pt) => sum + pt.y, 0) / shapeProjected.length;
+
+          ctx.save();
+          ctx.strokeStyle = "rgba(0, 225, 255, 0.05)";
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(brainCenterX, brainCenterY);
+          const midX = (brainCenterX + iconCenterX) / 2;
+          ctx.lineTo(midX, brainCenterY);
+          ctx.lineTo(midX, iconCenterY);
+          ctx.lineTo(iconCenterX, iconCenterY);
+          ctx.stroke();
+
+          const pOffset = (time * 0.25 + sIdx * 0.5) % 1.0;
+          let px = brainCenterX;
+          let py = brainCenterY;
+          if (pOffset < 0.33) {
+            const r = pOffset / 0.33;
+            px = brainCenterX + (midX - brainCenterX) * r;
+            py = brainCenterY;
+          } else if (pOffset < 0.66) {
+            const r = (pOffset - 0.33) / 0.33;
+            px = midX;
+            py = brainCenterY + (iconCenterY - brainCenterY) * r;
+          } else {
+            const r = (pOffset - 0.66) / 0.34;
+            px = midX + (iconCenterX - midX) * r;
+            py = iconCenterY;
+          }
+
+          ctx.beginPath();
+          ctx.arc(px, py, 1.8, 0, Math.PI * 2);
+          ctx.fillStyle = "#ffffff";
+          ctx.shadowBlur = 8;
+          ctx.shadowColor = "rgba(0, 225, 255, 1)";
+          ctx.fill();
+          ctx.shadowBlur = 0;
+          ctx.restore();
+        }
+      }
+
+      // 8. Telemetry overlay text telemetry
+      ctx.save();
+      ctx.font = "9px monospace";
+      ctx.fillStyle = "rgba(0, 225, 255, 0.22)";
+      
+      const hudMargin = 30;
+      ctx.fillText("[ NEURAL_NET: ACTIVE ]", hudMargin, hudMargin + 10);
+      ctx.fillText("[ COGNITIVE: ONLINE ]", hudMargin, hudMargin + 22);
+      ctx.beginPath();
+      ctx.moveTo(hudMargin - 6, hudMargin);
+      ctx.lineTo(hudMargin + 85, hudMargin);
+      ctx.moveTo(hudMargin - 6, hudMargin);
+      ctx.lineTo(hudMargin - 6, hudMargin + 30);
+      ctx.strokeStyle = "rgba(0, 225, 255, 0.15)";
+      ctx.stroke();
+
+      const trOffset = canvas.width - hudMargin - 150;
+      ctx.fillText("[ COMP_UNITS: OK ]", trOffset, hudMargin + 10);
+      ctx.fillText("[ DECISION_GRID: 1 ]", trOffset, hudMargin + 22);
+      ctx.beginPath();
+      ctx.moveTo(canvas.width - hudMargin + 6, hudMargin);
+      ctx.lineTo(canvas.width - hudMargin - 85, hudMargin);
+      ctx.moveTo(canvas.width - hudMargin + 6, hudMargin);
+      ctx.lineTo(canvas.width - hudMargin + 6, hudMargin + 30);
+      ctx.stroke();
+      ctx.restore();
+
+      // 9. Mathematical waves drifting at bottom boundary
+      ctx.save();
+      ctx.lineWidth = 0.85;
+      
+      // Wave 1: Cyan
+      ctx.strokeStyle = "rgba(0, 225, 255, 0.07)";
+      ctx.beginPath();
+      for (let x = 0; x < canvas.width; x += 20) {
+        const y = centerY + 120 + Math.sin(x * 0.0035 + time * 0.8) * 16 + Math.cos(x * 0.001 - time * 0.4) * 6;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Wave 2: Gold
+      ctx.strokeStyle = "rgba(197, 160, 89, 0.06)";
+      ctx.beginPath();
+      for (let x = 0; x < canvas.width; x += 20) {
+        const y = centerY + 135 + Math.sin(x * 0.002 - time * 0.6) * 14 + Math.cos(x * 0.003 + time * 0.5) * 5;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      ctx.restore();
+
+      // 10. Spotlight scanning sweep
+      if (mouse.x !== null && mouse.y !== null) {
+        const spotlight = ctx.createRadialGradient(
+          mouse.x, mouse.y, 0,
+          mouse.x, mouse.y, 140
+        );
+        spotlight.addColorStop(0, "rgba(0, 225, 255, 0.045)");
+        spotlight.addColorStop(0.5, "rgba(168, 85, 247, 0.015)");
+        spotlight.addColorStop(1, "rgba(0, 0, 0, 0)");
+        
+        ctx.fillStyle = spotlight;
+        ctx.beginPath();
+        ctx.arc(mouse.x, mouse.y, 140, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      animationFrameId = requestAnimationFrame(draw);
+    };
+
+    draw();
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      window.removeEventListener("resize", resizeCanvas);
+      if (parent) {
+        parent.removeEventListener("mousemove", handleMouseMove);
+        parent.removeEventListener("mouseleave", handleMouseLeave);
+      }
+    };
+  }, [logoRef]);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{
+        position: "absolute",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        pointerEvents: "none",
+        zIndex: 0,
+      }}
+    />
+  );
+}
+
