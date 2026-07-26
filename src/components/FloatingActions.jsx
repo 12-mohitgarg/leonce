@@ -11,7 +11,7 @@ export default function FloatingActions() {
   return (
     <div className="floating-actions-wrapper">
       {/* WhatsApp Button */}
-      <a
+      {/* <a
         href={`https://wa.me/${whatsappNumber}?text=${whatsappMessage}`}
         target="_blank"
         rel="noopener noreferrer"
@@ -20,17 +20,17 @@ export default function FloatingActions() {
       >
         <span className="tooltip">WhatsApp Chat</span>
         <MessageCircle size={24} fill="currentColor" />
-      </a>
+      </a> */}
 
       {/* Call Button */}
-      <a
+      {/* <a
         href={`tel:${phoneNumber}`}
         className="floating-btn float-call"
         aria-label="Direct Call Office"
       >
         <span className="tooltip">Call Office</span>
         <PhoneCall size={22} fill="currentColor" />
-      </a>
+      </a> */}
 
       <style>{`
         .floating-actions-wrapper {

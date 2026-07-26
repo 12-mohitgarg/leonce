@@ -79,21 +79,21 @@ const STATIC_PRODUCTS = [
     applications: "Corporate offices, education campus hubs, hotels, high-traffic commercial zones.",
     gallery: ["https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?auto=format&fit=crop&w=600&q=80"]
   },
-  {
-    id: "prod-router-2",
-    name: "High-Power Outdoor Mesh Node",
-    category: "WiFi Routers",
-    description: "Weatherproof IP67 rated outdoor wireless access point with mesh networking support for continuous public WiFi coverage.",
-    features: ["IP67 Weatherproof", "Seamless Roaming Mesh", "PoE Injector Powered", "Dual-Band Omni Antennas"],
-    specifications: {
-      "Antenna Gain": "5dBi Omni (Integrated)",
-      "Max Range": "300 Meters (Line of Sight)",
-      "PoE Standard": "802.3at PoE+",
-      "Temperature Limit": "-40°C to 65°C"
-    },
-    applications: "Public parks, warehouse yards, industrial campuses, farming estates.",
-    gallery: ["https://images.unsplash.com/photo-1551703599-6b3e8379aa8b?auto=format&fit=crop&w=600&q=80"]
-  },
+  // {
+  //   id: "prod-router-2",
+  //   name: "High-Power Outdoor Mesh Node",
+  //   category: "WiFi Routers",
+  //   description: "Weatherproof IP67 rated outdoor wireless access point with mesh networking support for continuous public WiFi coverage.",
+  //   features: ["IP67 Weatherproof", "Seamless Roaming Mesh", "PoE Injector Powered", "Dual-Band Omni Antennas"],
+  //   specifications: {
+  //     "Antenna Gain": "5dBi Omni (Integrated)",
+  //     "Max Range": "300 Meters (Line of Sight)",
+  //     "PoE Standard": "802.3at PoE+",
+  //     "Temperature Limit": "-40°C to 65°C"
+  //   },
+  //   applications: "Public parks, warehouse yards, industrial campuses, farming estates.",
+  //   gallery: ["https://images.unsplash.com/photo-1551703599-6b3e8379aa8b?auto=format&fit=crop&w=600&q=80"]
+  // },
   {
     id: "prod-net-1",
     name: "Gigabit Fiber Optic Media Converter",
@@ -268,7 +268,7 @@ export default function Products() {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            
+
             {/* Filters Info */}
             <div className="filters-header">
               <SlidersHorizontal size={16} />
@@ -351,7 +351,7 @@ export default function Products() {
                   </div>
                 )}
                 <span className="modal-tag">{selectedProduct.category}</span>
-                
+
                 <div className="modal-b2b-cta">
                   <h4>Procurement Quote</h4>
                   <p>Inquire about MOQ pricing, sample batches, and customs delivery rates.</p>
