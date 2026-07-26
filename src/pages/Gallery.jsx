@@ -15,14 +15,14 @@ export default function Gallery() {
   ];
 
   const galleryItems = [
-    { category: "Products", title: "High TG Multi-Layer PCBs", desc: "Inspection of multilayer HDI core panels.", icon: <Layers size={40} /> },
-    { category: "Products", title: "Automated SMT Assembly Line", desc: "Vacuum pick-and-place component trace runs.", icon: <Layers size={40} /> },
-    { category: "Warehouse", title: "ESD Secure Warehouse", desc: "Temperature and static shielded storage shelves.", icon: <Warehouse size={40} /> },
-    { category: "Warehouse", title: "Air-Cargo Consignment Consolidation", desc: "Sealing shipping pallets for dispatch.", icon: <Warehouse size={40} /> },
-    { category: "Office", title: "Technology Sourcing Desk", desc: "Our Mumbai coordination and customs clearing desk.", icon: <Building size={40} /> },
-    { category: "Team", title: "Procurement Desk Audit", desc: "Quality engineers reviewing electrical test sheets.", icon: <Users size={40} /> },
-    { category: "Operations", title: "Port customs Verification", desc: "WPC license checking and container seal matching.", icon: <Ship size={40} /> },
-    { category: "Events", title: "Global Electronics Exhibition", desc: "Leonce delegation contracting with fab operators.", icon: <Calendar size={40} /> }
+    { category: "Products", title: "High TG Multi-Layer PCBs", desc: "Inspection of multilayer HDI core panels.", icon: <Layers size={40} />, image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=600&q=80" },
+    { category: "Products", title: "Automated SMT Assembly Line", desc: "Vacuum pick-and-place component trace runs.", icon: <Layers size={40} />, image: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=600&q=80" },
+    { category: "Warehouse", title: "ESD Secure Warehouse", desc: "Temperature and static shielded storage shelves.", icon: <Warehouse size={40} />, image: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=600&q=80" },
+    { category: "Warehouse", title: "Air-Cargo Consignment Consolidation", desc: "Sealing shipping pallets for dispatch.", icon: <Warehouse size={40} />, image: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?auto=format&fit=crop&w=600&q=80" },
+    { category: "Office", title: "Technology Sourcing Desk", desc: "Our Mumbai coordination and customs clearing desk.", icon: <Building size={40} />, image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=600&q=80" },
+    { category: "Team", title: "Procurement Desk Audit", desc: "Quality engineers reviewing electrical test sheets.", icon: <Users size={40} />, image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&w=600&q=80" },
+    { category: "Operations", title: "Port customs Verification", desc: "WPC license checking and container seal matching.", icon: <Ship size={40} />, image: "https://images.unsplash.com/photo-1494412574643-ff11b0a5c1c3?auto=format&fit=crop&w=600&q=80" },
+    { category: "Events", title: "Global Electronics Exhibition", desc: "Leonce delegation contracting with fab operators.", icon: <Calendar size={40} />, image: "https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&w=600&q=80" }
   ];
 
   const filteredItems = activeTab === "All" 
@@ -61,8 +61,14 @@ export default function Gallery() {
           <div className="gallery-grid">
             {filteredItems.map((item, idx) => (
               <div className="gallery-card glass-card" key={idx}>
-                <div className="gallery-visual-placeholder">
-                  {item.icon}
+                <div className="gallery-image-container">
+                  {item.image ? (
+                    <img src={item.image} alt={item.title} className="gallery-card-img" />
+                  ) : (
+                    <div className="gallery-visual-fallback">
+                      {item.icon}
+                    </div>
+                  )}
                   <span className="gallery-card-tag">{item.category}</span>
                 </div>
                 <div className="gallery-card-info">
@@ -142,23 +148,39 @@ const styleStyle = (
       flex-direction: column;
     }
 
-    .gallery-visual-placeholder {
+    .gallery-image-container {
       height: 180px;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border-glass-blue);
+    }
+
+    .gallery-card-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: var(--transition-smooth);
+    }
+
+    .gallery-card:hover .gallery-card-img {
+      transform: scale(1.08);
+    }
+
+    .gallery-visual-fallback {
+      width: 100%;
+      height: 100%;
       background: rgba(13, 24, 56, 0.3);
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--color-cyan);
       opacity: 0.5;
-      position: relative;
-      border-bottom: 1px solid var(--border-glass-blue);
       transition: var(--transition-smooth);
     }
 
-    .gallery-card:hover .gallery-visual-placeholder {
+    .gallery-card:hover .gallery-visual-fallback {
       opacity: 1;
       color: var(--color-gold-bright);
-      transform: scale(1.02);
     }
 
     .gallery-card-tag {

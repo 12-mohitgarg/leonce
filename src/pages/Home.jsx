@@ -7,6 +7,8 @@ import {
 import InteractiveLogo from "../components/InteractiveLogo";
 import ClientSlider from "../components/ClientSlider";
 import ContactForm from "../components/ContactForm";
+import HologramGlobe from "../components/HologramGlobe";
+import CircuitTrail from "../components/CircuitTrail";
 
 // Custom Hook for Animated Counters
 function CountUp({ end, duration = 2000, suffix = "" }) {
@@ -105,7 +107,10 @@ export default function Home() {
         {/* High-Tech Interactive Particle Canvas Background */}
         <TechParticleCanvas logoRef={logoWrapperRef} />
 
-        <div className="hero-grid container" style={{ position: "relative", zIndex: 1 }}>
+        {/* Dynamic Circuit Trace Cursor Trail */}
+        <CircuitTrail />
+
+        <div className="hero-grid container" style={{ position: "relative", zIndex: 2 }}>
           <div className="hero-text-content">
             <span className="hero-badge">Technology Importer &amp; Distributor</span>
             <h1 className="hero-title">
@@ -125,8 +130,11 @@ export default function Home() {
             </div>
           </div>
           <div className="hero-visual-content">
-            <div ref={logoWrapperRef} className="hero-logo-glowing-wrapper">
-              <InteractiveLogo width="90%" animate={true} />
+            <div ref={logoWrapperRef} className="hero-logo-glowing-wrapper" style={{ position: "relative" }}>
+              <HologramGlobe />
+              <div style={{ position: "relative", zIndex: 2, width: "100%", display: "flex", justifyContent: "center" }}>
+                <InteractiveLogo width="90%" animate={true} />
+              </div>
             </div>
           </div>
         </div>

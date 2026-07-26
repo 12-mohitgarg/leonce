@@ -35,25 +35,66 @@ function ScrollToTop() {
 
   useEffect(() => {
     // Setup Intersection Observer for premium scroll entrance animations
-    const elements = document.querySelectorAll(".animate-on-scroll");
-    
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add("is-visible");
+            // Stop observing once it becomes visible to prevent repeated triggers
+            observer.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
+      { threshold: 0.05, rootMargin: "0px 0px -20px 0px" }
     );
 
-    elements.forEach((el) => observer.observe(el));
+    const observeElements = () => {
+      const elements = document.querySelectorAll(".animate-on-scroll");
+      elements.forEach((el) => {
+        if (!el.classList.contains("is-visible")) {
+          observer.observe(el);
+        }
+      });
+    };
+
+    // Run observation check immediately
+    observeElements();
+
+    // Fallbacks to handle dynamic React render lag and hydration timing
+    const timer1 = setTimeout(observeElements, 50);
+    const timer2 = setTimeout(observeElements, 200);
+    const timer3 = setTimeout(observeElements, 500);
+
+    // Watch DOM continuously using MutationObserver to detect elements added by React
+    const mutationObserver = new MutationObserver(() => {
+      observeElements();
+    });
+
+    mutationObserver.observe(document.body, {
+      childList: true,
+      subtree: true
+    });
+
+    // Handle scroll/resize and mouse movement as user engagement fallbacks to trigger animations
+    const handleEvents = () => {
+      observeElements();
+    };
+
+    window.addEventListener("scroll", handleEvents, { passive: true });
+    window.addEventListener("resize", handleEvents, { passive: true });
+    document.addEventListener("mousemove", handleEvents, { passive: true });
 
     return () => {
-      elements.forEach((el) => observer.unobserve(el));
+      observer.disconnect();
+      mutationObserver.disconnect();
+      clearTimeout(timer1);
+      clearTimeout(timer2);
+      clearTimeout(timer3);
+      window.removeEventListener("scroll", handleEvents);
+      window.removeEventListener("resize", handleEvents);
+      document.removeEventListener("mousemove", handleEvents);
     };
-  }, [pathname]); // Re-observe when path changes
+  }, [pathname]);
 
   return null;
 }
