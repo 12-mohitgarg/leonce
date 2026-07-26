@@ -1,9 +1,9 @@
 import React from "react";
-import { User, Quote, Shield, Award, Calendar, Lightbulb, PenTool } from "lucide-react";
+import { Quote, Shield, Calendar, Lightbulb, PenTool } from "lucide-react";
 
 export default function ManagingDirector() {
   const experiences = [
-    { title: "15+ Years", desc: "Active experience in global component distribution & supply chain logistics." },
+    { title: "Since 2025", desc: "Director leadership for global component distribution and supply chain logistics." },
     { title: "WPC & Telecom clearance", desc: "Expertise in managing wireless product certificates and customs codes." },
     { title: "B2B Partnership desk", desc: "Orchestrated delivery networks with top electronics OEMs." }
   ];
@@ -14,9 +14,9 @@ export default function ManagingDirector() {
       <section className="page-header bg-deep-navy">
         <div className="container text-center">
           <span className="section-subtitle">Leadership Message</span>
-          <h1 className="section-title">Managing Director's Desk</h1>
+          <h1 className="section-title">Directors' Desk</h1>
           <p className="section-desc">
-            Direct communication from our Founder &amp; MD outlining our technology imports direction and vision.
+            Direct communication from our directors outlining our technology imports direction and vision from 2025 onward.
           </p>
         </div>
       </section>
@@ -24,16 +24,17 @@ export default function ManagingDirector() {
       {/* CORE PROFILE SECTION */}
       <section className="section animate-on-scroll">
         <div className="container md-grid">
-          {/* Left: MD Photo Panel */}
+          {/* Left: Director Details Panel */}
           <div className="md-photo-panel glass-card">
-            <div className="md-avatar-container">
-              {/* Premium Tech Avatar Visual */}
-              <User size={120} className="md-avatar-icon" />
-              <div className="avatar-glow"></div>
+            <div className="director-year-badge">
+              <Calendar size={42} className="director-year-icon" />
+              <span>From 2025</span>
             </div>
             <div className="md-meta-text">
-              <h3>Mohammad Faizan</h3>
-              <span className="designation">Founder &amp; Managing Director</span>
+              <h3>Shantilal Kumhar</h3>
+              <span className="designation">Director</span>
+              <h3>Yanda Kishor</h3>
+              <span className="designation">Director</span>
               <p className="organization">Leonce Multiventure</p>
             </div>
             
@@ -57,7 +58,7 @@ export default function ManagingDirector() {
             <div className="md-story">
               <h3>Dear Valued Business Partners, Wholesalers &amp; Clients,</h3>
               <p>
-                Welcome to Leonce Multiventure. Since our founding in 2019, our trajectory has been driven by a single guiding objective: <strong>to simplify, audit, and secure technology sourcing channels.</strong>
+                Welcome to Leonce Multiventure. From 2025, our director-led operations continue with a single guiding objective: <strong>to simplify, audit, and secure technology sourcing channels.</strong>
               </p>
               <p>
                 The modern electronics industry moves at a rapid pace. High-density PCB boards, SMT component trace assemblies, WiFi routers, and IoT terminals are building blocks for automation, smart cities, and communication systems. However, sourcing these components at scale without quality degradation or customs logjams requires specialized expertise.
@@ -87,11 +88,11 @@ export default function ManagingDirector() {
             {/* Signature representation */}
             <div className="signature-container">
               <div className="signature-line">
-                <span className="cursive-signature">M. Faizan</span>
+                <span className="cursive-signature">Directors</span>
                 <PenTool size={16} className="signature-tool-icon" />
               </div>
-              <span className="signature-lbl">Mohammad Faizan</span>
-              <span className="signature-sub">Managing Director, Leonce Multiventure</span>
+              <span className="signature-lbl">Shantilal Kumhar &amp; Yanda Kishor</span>
+              <span className="signature-sub">Directors, Leonce Multiventure</span>
             </div>
           </div>
         </div>
@@ -116,7 +117,7 @@ export default function ManagingDirector() {
           align-items: flex-start;
         }
 
-        /* Left Photo Panel */
+        /* Left Director Panel */
         .md-photo-panel {
           text-align: center;
           padding: 40px 30px;
@@ -126,38 +127,48 @@ export default function ManagingDirector() {
           align-items: center;
         }
 
-        .md-avatar-container {
+        .director-year-badge {
           position: relative;
           width: 180px;
           height: 180px;
-          border-radius: 50%;
+          border-radius: 4px;
           background: var(--bg-deep-navy);
           border: 3px solid var(--color-gold);
           display: flex;
+          flex-direction: column;
           align-items: center;
           justify-content: center;
+          gap: 12px;
           margin-bottom: 25px;
           overflow: hidden;
           box-shadow: var(--shadow-neon-gold);
         }
 
-        .md-avatar-icon {
-          color: var(--text-muted);
-          z-index: 2;
+        .director-year-badge::before {
+          content: '';
+          position: absolute;
+          inset: 12px;
+          border: 1px solid rgba(0, 225, 255, 0.22);
+          border-radius: 4px;
         }
 
-        .avatar-glow {
-          position: absolute;
-          width: 100%;
-          height: 100%;
-          background: radial-gradient(circle, rgba(197, 160, 89, 0.2) 0%, transparent 70%);
-          z-index: 1;
+        .director-year-icon {
+          color: var(--color-cyan);
+          filter: drop-shadow(0 0 8px rgba(0, 225, 255, 0.35));
+        }
+
+        .director-year-badge span {
+          color: var(--color-gold-bright);
+          font-family: var(--font-display);
+          font-weight: 800;
+          text-transform: uppercase;
+          letter-spacing: 2px;
         }
 
         .md-meta-text h3 {
           font-size: 1.5rem;
           color: var(--text-white);
-          margin-bottom: 5px;
+          margin: 14px 0 5px;
         }
 
         .md-meta-text .designation {
@@ -342,13 +353,9 @@ export default function ManagingDirector() {
           .md-photo-panel {
             padding: 30px 20px;
           }
-          .md-avatar-container {
+          .director-year-badge {
             width: 150px;
             height: 150px;
-          }
-          .md-avatar-icon {
-            width: 100px;
-            height: 100px;
           }
           .quote-intro h2 {
             font-size: 1.3rem;

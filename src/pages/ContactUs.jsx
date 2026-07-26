@@ -6,12 +6,17 @@ export default function ContactUs() {
     {
       icon: <MapPin className="contact-card-icon" />,
       title: "Corporate Headquarters",
-      details: "Leonce Multiventure, Suite 402, Technology Square, Mumbai, MH 400051, India"
+      details: "OFFICE 523D, SWASTIK DISHA CORPORATE PARK, KOHINOOR COMPOUND, LBS MARG, GHATKOPAR WEST OPP SHREYAS CINEMA, Mumbai, Mumbai, Mumbai, Maharashtra, India, 400086"
     },
     {
       icon: <Mail className="contact-card-icon" />,
-      title: "Direct email Inquiries",
-      details: "info@leonce-multiventure.com"
+      title: "Support Email",
+      details: "support@leoncemultiventure.com"
+    },
+    {
+      icon: <Mail className="contact-card-icon" />,
+      title: "Banking Email",
+      details: "banking@leoncemultiventure.com"
     },
     {
       icon: <Clock className="contact-card-icon" />,
@@ -97,7 +102,7 @@ export default function ContactUs() {
               <MapPin size={48} className="map-pin-pulse" />
               <div className="mock-maps-popup glass-card">
                 <h4>Leonce Multiventure</h4>
-                <p>Suite 402, Technology Square, Mumbai</p>
+                <p>OFFICE 523D, SWASTIK DISHA CORPORATE PARK, GHATKOPAR WEST, Mumbai 400086</p>
                 <a href="https://maps.google.com" target="_blank" rel="noreferrer" className="btn-map-link">Open in Google Maps</a>
               </div>
             </div>

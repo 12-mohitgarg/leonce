@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import InteractiveLogo from "./InteractiveLogo";
 
 export default function Loader() {
   const [loading, setLoading] = useState(true);
@@ -17,11 +18,7 @@ export default function Loader() {
     <div className="loader-overlay">
       <div className="loader-content">
         <div className="loader-logo">
-          <svg xmlns="http://www.w3.org/2000/svg" width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <polygon points="12 2 2 7 12 12 22 7 12 2" />
-            <polygon points="2 17 12 22 22 17" />
-            <polygon points="2 12 12 17 22 12" />
-          </svg>
+          <InteractiveLogo width="120" height="120" animate={true} />
         </div>
         <div className="loader-spinner">
           <div className="spinner-ring"></div>
@@ -64,8 +61,9 @@ export default function Loader() {
         }
 
         .loader-logo {
-          color: #c5a059;
-          margin-bottom: 30px;
+          width: 120px;
+          height: 120px;
+          margin: 0 auto 30px;
           animation: logoPulse 2s ease-in-out infinite;
         }
 

@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { Menu, Cpu, ChevronDown } from "lucide-react";
+import { Menu, ChevronDown } from "lucide-react";
 import { subscribeToAuth } from "../firebase";
+import InteractiveLogo from "./InteractiveLogo";
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -38,7 +39,7 @@ export default function Navbar() {
   // Dropdown Link Groups
   const corporateLinks = [
     { path: "/about", label: "About Company" },
-    { path: "/md", label: "Managing Director" },
+    { path: "/md", label: "Directors" },
     { path: "/faq", label: "FAQ Desk" },
   ];
 
@@ -64,7 +65,7 @@ export default function Navbar() {
         {/* Brand Logo */}
         <Link to="/" className="navbar-logo-link">
           <div className="navbar-logo-wrapper">
-            <Cpu className="logo-svg-icon" />
+            <InteractiveLogo width="48" height="48" className="navbar-logo-mark" animate={false} />
             <div className="navbar-brand-text">
               <span className="brand-primary">LEONCE</span>
               <span className="brand-secondary">MULTIVENTURE</span>
@@ -253,10 +254,9 @@ export default function Navbar() {
           gap: 10px;
         }
 
-        .logo-svg-icon {
-          color: var(--color-cyan);
-          width: 26px;
-          height: 26px;
+        .navbar-logo-mark {
+          width: 48px;
+          height: 48px;
           filter: drop-shadow(0 0 8px rgba(0, 225, 255, 0.6));
           animation: float 4s ease-in-out infinite;
         }

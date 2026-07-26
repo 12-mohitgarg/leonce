@@ -103,7 +103,7 @@ export default function ContactForm() {
                 name="name"
                 value={formData.name}
                 onChange={handleChange}
-                placeholder="e.g. Mohammad Faizan"
+                placeholder="e.g. Shantilal Kumhar"
                 required
               />
             </div>

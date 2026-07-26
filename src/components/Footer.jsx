@@ -1,6 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Mail, Phone, MapPin, Globe, ArrowUp } from "lucide-react";
+import { Mail, MapPin, Globe, ArrowUp } from "lucide-react";
+import InteractiveLogo from "./InteractiveLogo";
 
 export default function Footer() {
   const scrollToTop = () => {
@@ -14,8 +15,11 @@ export default function Footer() {
           {/* Column 1: Info */}
           <div className="footer-col info-col">
             <div className="footer-brand">
-              <span className="brand-text-primary">LEONCE</span>
-              <span className="brand-text-secondary">MULTIVENTURE</span>
+              <InteractiveLogo width="92" height="92" className="footer-logo-mark" animate={false} />
+              <div className="footer-brand-text">
+                <span className="brand-text-primary">LEONCE</span>
+                <span className="brand-text-secondary">MULTIVENTURE</span>
+              </div>
             </div>
             <p className="footer-desc">
               Premier technology importer and electronics distribution enterprise. Connecting global manufacturers with wholesale distributors and B2B projects.
@@ -39,7 +43,7 @@ export default function Footer() {
             <h3 className="footer-heading">Quick Links</h3>
             <ul className="footer-links">
               <li><Link to="/about">About Company</Link></li>
-              <li><Link to="/md">Managing Director</Link></li>
+              <li><Link to="/md">Directors</Link></li>
               <li><Link to="/portfolio">Corporate Portfolio</Link></li>
               <li><Link to="/certifications">Certifications</Link></li>
               <li><Link to="/faq">Frequently Asked Questions</Link></li>
@@ -66,11 +70,15 @@ export default function Footer() {
             <ul className="footer-contact-list">
               <li>
                 <MapPin size={20} className="contact-icon" />
-                <span>Leonce Multiventure, Suite 402, Technology Square, Mumbai, MH 400051, India</span>
+                <span>OFFICE 523D, SWASTIK DISHA CORPORATE PARK, KOHINOOR COMPOUND, LBS MARG, GHATKOPAR WEST OPP SHREYAS CINEMA, Mumbai, Mumbai, Mumbai, Maharashtra, India, 400086</span>
               </li>
               <li>
                 <Mail size={18} className="contact-icon" />
-                <a href="mailto:info@leonce-multiventure.com">info@leonce-multiventure.com</a>
+                <a href="mailto:support@leoncemultiventure.com">support@leoncemultiventure.com</a>
+              </li>
+              <li>
+                <Mail size={18} className="contact-icon" />
+                <a href="mailto:banking@leoncemultiventure.com">banking@leoncemultiventure.com</a>
               </li>
             </ul>
           </div>
@@ -80,7 +88,7 @@ export default function Footer() {
       <div className="footer-bottom">
         <div className="footer-bottom-container">
           <p className="copyright">
-            &copy; {new Date().getFullYear()} LEONCE MULTIVENTURE. All Rights Reserved. Designed by Faizan.
+            &copy; {new Date().getFullYear()} LEONCE MULTIVENTURE. All Rights Reserved.
           </p>
           <div className="footer-bottom-links">
             <Link to="/privacy">Privacy Policy</Link>
@@ -122,8 +130,21 @@ export default function Footer() {
 
         .footer-brand {
           display: flex;
-          flex-direction: column;
+          align-items: center;
+          gap: 12px;
           line-height: 1.1;
+        }
+
+        .footer-logo-mark {
+          width: 72px;
+          height: 72px;
+          flex-shrink: 0;
+          filter: drop-shadow(0 0 10px rgba(0, 225, 255, 0.35));
+        }
+
+        .footer-brand-text {
+          display: flex;
+          flex-direction: column;
         }
 
         .brand-text-primary {

@@ -342,7 +342,8 @@ export default function Home() {
                 <MessageSquare size={18} className="cta-icon" />
                 <div>
                   <span>Email Inquiries</span>
-                  <h4>info@leonce-multiventure.com</h4>
+                  <h4>support@leoncemultiventure.com</h4>
+                  <h4>banking@leoncemultiventure.com</h4>
                 </div>
               </div>
             </div>

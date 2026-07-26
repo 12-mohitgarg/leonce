@@ -1,6 +1,16 @@
-import React from "react";
+import React, { useId } from "react";
 
 export default function InteractiveLogo({ width = "100%", height = "auto", className = "", animate = true }) {
+  const rawId = useId().replace(/:/g, "");
+  const ids = {
+    metallicBlue: `${rawId}-metallicBlue`,
+    neonCyan: `${rawId}-neonCyan`,
+    metallicGold: `${rawId}-metallicGold`,
+    metallicSilver: `${rawId}-metallicSilver`,
+    goldGlow: `${rawId}-goldGlow`,
+    blueGlow: `${rawId}-blueGlow`,
+  };
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -12,20 +22,20 @@ export default function InteractiveLogo({ width = "100%", height = "auto", class
     >
       <defs>
         {/* Metallic Blue Gradient */}
-        <linearGradient id="metallicBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id={ids.metallicBlue} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#0052d4" />
           <stop offset="50%" stopColor="#4364f7" />
           <stop offset="100%" stopColor="#6fb1fc" />
         </linearGradient>
 
         {/* Glowing Cyan Gradient */}
-        <linearGradient id="neonCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id={ids.neonCyan} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#0072ff" />
           <stop offset="100%" stopColor="#00e1ff" />
         </linearGradient>
 
         {/* Metallic Gold Gradient */}
-        <linearGradient id="metallicGold" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id={ids.metallicGold} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#8c6d33" />
           <stop offset="30%" stopColor="#f3cf65" />
           <stop offset="70%" stopColor="#c5a059" />
@@ -33,20 +43,20 @@ export default function InteractiveLogo({ width = "100%", height = "auto", class
         </linearGradient>
 
         {/* Metallic Silver Gradient */}
-        <linearGradient id="metallicSilver" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id={ids.metallicSilver} x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#737b84" />
           <stop offset="50%" stopColor="#f1f2f6" />
           <stop offset="100%" stopColor="#95a5a6" />
         </linearGradient>
 
         {/* Drop Shadow for Gold Elements */}
-        <filter id="goldGlow" x="-20%" y="-20%" width="140%" height="140%">
+        <filter id={ids.goldGlow} x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur stdDeviation="8" result="blur" />
           <feComposite in="SourceGraphic" in2="blur" operator="over" />
         </filter>
 
         {/* Drop Shadow for Blue Elements */}
-        <filter id="blueGlow" x="-20%" y="-20%" width="140%" height="140%">
+        <filter id={ids.blueGlow} x="-20%" y="-20%" width="140%" height="140%">
           <feGaussianBlur stdDeviation="12" result="blur" />
           <feComponentTransfer in="blur" result="glow1">
             <feFuncA type="linear" slope="0.6" />
@@ -130,8 +140,8 @@ export default function InteractiveLogo({ width = "100%", height = "auto", class
            L 410 360 
            A 220 220 0 0 1 210 430 
            Z"
-        fill="url(#metallicBlue)"
-        filter="url(#blueGlow)"
+        fill={`url(#${ids.metallicBlue})`}
+        filter={`url(#${ids.blueGlow})`}
       />
 
       {/* 4. SHINY GOLD INITIAL "M" (RIGHT LAYER, OVERLAPPING) */}
@@ -148,8 +158,8 @@ export default function InteractiveLogo({ width = "100%", height = "auto", class
            L 370 270
            L 370 430
            Z"
-        fill="url(#metallicGold)"
-        filter="url(#goldGlow)"
+        fill={`url(#${ids.metallicGold})`}
+        filter={`url(#${ids.goldGlow})`}
       />
 
       {/* 5. INTERTWINING ORBIT SWOOSH (BLUE & GOLD) */}
@@ -159,9 +169,9 @@ export default function InteractiveLogo({ width = "100%", height = "auto", class
            C 560 420, 680 320, 640 200 
            C 625 150, 560 110, 480 90"
         fill="none"
-        stroke="url(#metallicGold)"
+        stroke={`url(#${ids.metallicGold})`}
         strokeWidth="6"
-        filter="url(#goldGlow)"
+        filter={`url(#${ids.goldGlow})`}
       />
       
       <path
@@ -169,13 +179,13 @@ export default function InteractiveLogo({ width = "100%", height = "auto", class
            C 120 490, 220 540, 390 480 
            C 560 420, 680 320, 640 200"
         fill="none"
-        stroke="url(#neonCyan)"
+        stroke={`url(#${ids.neonCyan})`}
         strokeWidth="2.5"
         className="orbit-path"
       />
 
       {/* 6. WIFI ROUTER GRAPHIC (RIGHT SIDE) */}
-      <g transform="translate(620, 310)" filter="url(#blueGlow)">
+      <g transform="translate(620, 310)" filter={`url(#${ids.blueGlow})`}>
         {/* Router Base */}
         <rect x="0" y="70" width="160" height="36" rx="6" fill="#1b2440" stroke="#00e1ff" strokeWidth="2" />
         <rect x="15" y="86" width="70" height="4" fill="#00e1ff" />
@@ -184,8 +194,8 @@ export default function InteractiveLogo({ width = "100%", height = "auto", class
         <circle cx="145" cy="88" r="3" fill="#00e1ff" />
         
         {/* Antennas */}
-        <line x1="15" y1="70" x2="10" y2="15" stroke="url(#metallicSilver)" strokeWidth="4.5" />
-        <line x1="145" y1="70" x2="150" y2="15" stroke="url(#metallicSilver)" strokeWidth="4.5" />
+        <line x1="15" y1="70" x2="10" y2="15" stroke={`url(#${ids.metallicSilver})`} strokeWidth="4.5" />
+        <line x1="145" y1="70" x2="150" y2="15" stroke={`url(#${ids.metallicSilver})`} strokeWidth="4.5" />
         
         {/* Wifi Waves */}
         <path d="M 60 25 A 30 30 0 0 1 100 25" fill="none" stroke="#00e1ff" strokeWidth="2.5" strokeLinecap="round" className="wifi-wave-1" />
@@ -201,7 +211,7 @@ export default function InteractiveLogo({ width = "100%", height = "auto", class
         fontSize="54"
         fontWeight="800"
         letterSpacing="12"
-        fill="url(#metallicSilver)"
+        fill={`url(#${ids.metallicSilver})`}
         textAnchor="middle"
       >
         LEONCE
@@ -219,15 +229,15 @@ export default function InteractiveLogo({ width = "100%", height = "auto", class
         fontSize="30"
         fontWeight="600"
         letterSpacing="8"
-        fill="url(#metallicGold)"
+        fill={`url(#${ids.metallicGold})`}
         textAnchor="middle"
-        filter="url(#goldGlow)"
+        filter={`url(#${ids.goldGlow})`}
       >
         MULTIVENTURE
       </text>
 
       {/* Divider Gold Lines */}
-      <line x1="80" y1="620" x2="720" y2="620" stroke="url(#metallicGold)" strokeWidth="1.5" />
+      <line x1="80" y1="620" x2="720" y2="620" stroke={`url(#${ids.metallicGold})`} strokeWidth="1.5" />
       <circle cx="80" cy="620" r="3" fill="#c5a059" />
       <circle cx="720" cy="620" r="3" fill="#c5a059" />
 
@@ -263,7 +273,7 @@ export default function InteractiveLogo({ width = "100%", height = "auto", class
         <g transform="translate(280, 0)">
           <rect x="0" y="0" width="70" height="70" rx="10" fill="#080f24" stroke="#00e1ff" strokeWidth="1.5" />
           <rect x="15" y="15" width="40" height="40" fill="#1b2440" rx="3" />
-          <rect x="25" y="25" width="20" height="20" fill="url(#metallicGold)" rx="2" />
+          <rect x="25" y="25" width="20" height="20" fill={`url(#${ids.metallicGold})`} rx="2" />
           <circle cx="20" cy="20" r="2.5" fill="#00e1ff" />
           <circle cx="50" cy="20" r="2.5" fill="#00e1ff" />
           <circle cx="20" cy="50" r="2.5" fill="#00e1ff" />
