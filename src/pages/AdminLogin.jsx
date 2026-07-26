@@ -100,12 +100,6 @@ export default function AdminLogin() {
             )}
           </button>
         </form>
-
-        <div className="login-fallback-info">
-          <h4>Testing Credentials:</h4>
-          <p>Email: <code>admin@leonce.com</code></p>
-          <p>Password: <code>LeonceAdmin2026!</code></p>
-        </div>
       </div>
 
       {styleStyle}

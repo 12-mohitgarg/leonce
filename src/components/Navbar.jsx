@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { Menu, X, ShieldAlert, Cpu, ChevronDown } from "lucide-react";
+import { Menu, Cpu, ChevronDown } from "lucide-react";
 import { subscribeToAuth } from "../firebase";
 
 export default function Navbar() {
@@ -139,17 +139,7 @@ export default function Navbar() {
           <NavLink to="/contact" className={({ isActive }) => `nav-link ${isActive ? "nav-link-active" : ""}`}>
             Contact Us
           </NavLink>
-          
-          {/* Admin desk button */}
-          {adminUser ? (
-            <NavLink to="/admin/dashboard" className="nav-btn-admin admin-active">
-              <ShieldAlert size={14} /> Admin Desk
-            </NavLink>
-          ) : (
-            <NavLink to="/admin/login" className="nav-btn-admin">
-              Admin Login
-            </NavLink>
-          )}
+
         </div>
 
         {/* Mobile Toggle */}
@@ -158,7 +148,7 @@ export default function Navbar() {
           className="navbar-mobile-toggle"
           aria-label="Toggle menu"
         >
-          {isOpen ? <X size={26} /> : <Menu size={26} />}
+          <Menu size={26} />
         </button>
       </div>
 
@@ -218,19 +208,6 @@ export default function Navbar() {
               {link.label}
             </NavLink>
           ))}
-        </div>
-
-        {/* Admin Link at Bottom */}
-        <div className="mobile-section-block" style={{ marginTop: 10, border: "none" }}>
-          {adminUser ? (
-            <Link to="/admin/dashboard" className="mobile-nav-link mobile-nav-admin">
-              <ShieldAlert size={16} style={{ marginRight: 6 }} /> Admin Portal
-            </Link>
-          ) : (
-            <Link to="/admin/login" className="mobile-nav-link mobile-nav-admin">
-              Admin Login Desk
-            </Link>
-          )}
         </div>
       </div>
 
@@ -471,6 +448,8 @@ export default function Navbar() {
           color: var(--text-white);
           cursor: pointer;
           transition: var(--transition-fast);
+          position: relative;
+          z-index: 1001;
         }
 
         .navbar-mobile-toggle:hover {
@@ -493,6 +472,7 @@ export default function Navbar() {
           flex-direction: column;
           gap: 25px;
           overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
           transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
           z-index: 999;
           box-shadow: -15px 0 35px rgba(0, 0, 0, 0.8);
@@ -508,6 +488,7 @@ export default function Navbar() {
           gap: 6px;
           border-bottom: 1px solid rgba(255, 255, 255, 0.04);
           padding-bottom: 12px;
+          flex-shrink: 0;
         }
 
         .mobile-section-hdr {

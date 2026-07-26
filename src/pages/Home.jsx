@@ -843,196 +843,211 @@ function TechParticleCanvas({ logoRef }) {
 
     const ctx = canvas.getContext("2d");
     let animationFrameId;
-    
-    let brainNodes = [];
+
+    let buildings = [];
+    let cars = [];
+    let drones = [];
+    let satellites = [];
+    let screens = [];
     let particles = [];
-    let shapes = [];
-    let binaryRain = [];
-    let pcbTracks = [];
-    let hexClusters = [];
-    
+    let lightning = null;
+
     let time = 0;
-    const focalLength = 320;
-    let camAngleX = 0;
-    let camAngleY = 0;
+    const focalLength = 380;
+    let camAngleX = -0.32; // pitch, looking down
+    let camAngleY = 0;     // yaw
     const mouse = { x: null, y: null };
 
     const resizeCanvas = () => {
       canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
-      
-      initBrainNodes();
+
+      initBuildings();
+      initCars();
+      initDrones();
+      initSatellites();
+      initScreens();
       initParticles();
-      initGlassPanels();
-      initBinaryRain();
-      initPCBTracks();
-      initHexClusters();
     };
 
-    // 3D rotation helpers
-    const rotateX = (x, y, z, angle) => {
-      const cos = Math.cos(angle);
-      const sin = Math.sin(angle);
+    const project = (x, y, z) => {
+      // 3D rotations relative to center (0,0,0)
+      // Rotate around Y-axis (yaw)
+      const cosY = Math.cos(camAngleY);
+      const sinY = Math.sin(camAngleY);
+      const x1 = x * cosY - z * sinY;
+      const z1 = x * sinY + z * cosY;
+
+      // Rotate around X-axis (pitch)
+      const cosX = Math.cos(camAngleX);
+      const sinX = Math.sin(camAngleX);
+      const y2 = y * cosX - z1 * sinX;
+      const z2 = y * sinX + z1 * cosX;
+
+      // Camera translation drift
+      const cameraX = 0;
+      const cameraY = 160 + Math.cos(time * 0.05) * 30; // slow drift
+      const cameraZ = 720 + Math.sin(time * 0.04) * 80; // slow zoom
+
+      const transX = x1 + cameraX;
+      const transY = y2 + cameraY;
+      const transZ = z2 + cameraZ;
+
+      const scale = focalLength / Math.max(1, transZ);
+      const sx = (canvas.width / 2) + transX * scale;
+      const sy = (canvas.height / 2) + transY * scale;
+
       return {
-        x,
-        y: y * cos - z * sin,
-        z: y * sin + z * cos
+        x: sx,
+        y: sy,
+        z: transZ,
+        scale
       };
     };
 
-    const rotateY = (x, y, z, angle) => {
-      const cos = Math.cos(angle);
-      const sin = Math.sin(angle);
-      return {
-        x: x * cos - z * sin,
-        y,
-        z: x * sin + z * cos
-      };
+    const initBuildings = () => {
+      buildings = [];
+      const gridSpacing = 160;
+      for (let gx = -2; gx <= 2; gx++) {
+        for (let gz = -2; gz <= 2; gz++) {
+          if (gx === 0 && gz === 0 && Math.random() < 0.4) continue;
+          if (Math.random() < 0.15) continue; // 85% density
+
+          const bx = gx * gridSpacing + (Math.random() - 0.5) * 35;
+          const bz = gz * gridSpacing + (Math.random() - 0.5) * 35;
+          const w = Math.random() * 25 + 50;
+          const d = Math.random() * 25 + 50;
+          const h = Math.random() * 190 + 130;
+          const isGold = Math.random() < 0.35;
+
+          // Generate internal vertical lines / windows
+          const lines = [];
+          const lineCount = Math.floor(Math.random() * 3) + 2;
+          for (let l = 0; l < lineCount; l++) {
+            lines.push({
+              offsetX: (Math.random() - 0.5) * w * 0.8,
+              offsetZ: (Math.random() - 0.5) * d * 0.8,
+              speed: Math.random() * 1.2 + 0.6,
+              offset: Math.random() * 100,
+              length: Math.random() * 30 + 15
+            });
+          }
+
+          buildings.push({
+            x: bx,
+            z: bz,
+            w,
+            d,
+            h,
+            isGold,
+            lines
+          });
+        }
+      }
     };
 
-    const rotateZ = (x, y, z, angle) => {
-      const cos = Math.cos(angle);
-      const sin = Math.sin(angle);
-      return {
-        x: x * cos - y * sin,
-        y: x * sin + y * cos,
-        z
-      };
-    };
+    const initCars = () => {
+      cars = [];
+      const carCount = 18;
+      for (let i = 0; i < carCount; i++) {
+        const isZAxis = Math.random() < 0.5;
+        const speed = (Math.random() * 2.2 + 2) * (Math.random() < 0.5 ? 1 : -1);
 
-    const initBrainNodes = () => {
-      brainNodes = [];
-      const nodeCount = 260; // Thousands/hundreds of particles forming the brain
-      const baseRadius = Math.min(canvas.width, canvas.height) * 0.12;
-
-      for (let i = 0; i < nodeCount; i++) {
-        // Generate coordinates on a wrinkled sphere model represent brain shape
-        const phi = Math.acos(1 - 2 * (i + 0.5) / nodeCount);
-        const theta = Math.PI * (1 + Math.sqrt(5)) * (i + 0.5);
-
-        const r = baseRadius * (1 + 0.16 * Math.sin(6 * theta) * Math.sin(5 * phi) + 0.05 * Math.sin(18 * phi));
-        
-        let tx = Math.cos(theta) * Math.sin(phi) * r;
-        let ty = Math.sin(theta) * Math.sin(phi) * r * 0.85; // slightly flattened vertically
-        let tz = Math.cos(phi) * r * 1.15;              // elongated front-to-back
-
-        // Separate into left and right hemispheres (longitudinal fissure)
-        const hemisphere = tx > 0 ? 1 : -1;
-        tx += hemisphere * 4.5;
-
-        brainNodes.push({
-          startX: (Math.random() - 0.5) * 1000,
-          startY: (Math.random() - 0.5) * 800,
-          startZ: (Math.random() - 0.5) * 800,
-          targetX: tx,
-          targetY: ty,
-          targetZ: tz,
-          color: Math.random() < 0.72 ? "rgba(0, 225, 255," : "rgba(197, 160, 89,"
+        cars.push({
+          x: isZAxis ? (Math.random() - 0.5) * 600 : (Math.random() < 0.5 ? -450 : 450),
+          y: -Math.random() * 140 - 70,
+          z: isZAxis ? (Math.random() < 0.5 ? -450 : 450) : (Math.random() - 0.5) * 600,
+          vx: isZAxis ? 0 : speed,
+          vz: isZAxis ? speed : 0,
+          isZAxis,
+          isGold: Math.random() < 0.4,
+          history: []
         });
       }
+    };
+
+    const initDrones = () => {
+      drones = [];
+      const droneCount = 6;
+      for (let i = 0; i < droneCount; i++) {
+        drones.push({
+          cx: (Math.random() - 0.5) * 450,
+          cy: -Math.random() * 180 - 140,
+          cz: (Math.random() - 0.5) * 450,
+          radius: Math.random() * 35 + 15,
+          speed: Math.random() * 0.02 + 0.012,
+          phase: Math.random() * Math.PI * 2,
+          rotSpeed: Math.random() * 0.08 + 0.04
+        });
+      }
+    };
+
+    const initSatellites = () => {
+      satellites = [];
+      satellites.push({
+        x: -220,
+        y: -360,
+        z: -220,
+        size: 30,
+        rotSpeed: 0.004,
+        angle: 0
+      });
+      satellites.push({
+        x: 240,
+        y: -370,
+        z: 220,
+        size: 35,
+        rotSpeed: -0.006,
+        angle: Math.PI / 4
+      });
+    };
+
+    const initScreens = () => {
+      screens = [];
+      screens.push({
+        x: 0,
+        y: -90,
+        z: -140,
+        w: 90,
+        h: 50,
+        rotY: 0,
+        type: "matrix"
+      });
+      screens.push({
+        x: -140,
+        y: -120,
+        z: 50,
+        w: 75,
+        h: 40,
+        rotY: Math.PI / 4,
+        type: "sine"
+      });
+      screens.push({
+        x: 140,
+        y: -110,
+        z: -40,
+        w: 80,
+        h: 45,
+        rotY: -Math.PI / 6,
+        type: "grid"
+      });
     };
 
     const initParticles = () => {
       particles = [];
-      const particleCount = canvas.width < 768 ? 40 : 100; // Spark particles
-      for (let i = 0; i < particleCount; i++) {
+      const count = 150;
+      const roadOffsets = [-150, -75, 75, 150];
+      for (let i = 0; i < count; i++) {
+        const offsetVal = roadOffsets[Math.floor(Math.random() * roadOffsets.length)];
+        const isZDirection = Math.random() < 0.5;
+
         particles.push({
-          x: (Math.random() - 0.5) * 700,
-          y: (Math.random() - 0.5) * 500,
-          z: (Math.random() - 0.5) * 500,
-          speed: Math.random() * 0.25 + 0.1,
-          angleOffset: Math.random() * Math.PI * 2,
-          size: Math.random() * 0.7 + 0.35,
-          color: Math.random() < 0.65 ? "rgba(0, 225, 255," : "rgba(168, 85, 247,"
-        });
-      }
-    };
-
-    const initGlassPanels = () => {
-      const panelVerts = [
-        { x: -50, y: -30, z: 0 },
-        { x: 50, y: -30, z: 0 },
-        { x: 50, y: 30, z: 0 },
-        { x: -50, y: 30, z: 0 }
-      ];
-      
-      const cpuVerts = [
-        { x: -16, y: -16, z: 0 }, { x: 16, y: -16, z: 0 }, { x: 16, y: 16, z: 0 }, { x: -16, y: 16, z: 0 }
-      ];
-      const cpuEdges = [[0, 1], [1, 2], [2, 3], [3, 0]];
-
-      shapes = [
-        {
-          type: "glass",
-          vertices: panelVerts,
-          offsetX: -240,
-          offsetY: -80,
-          offsetZ: 40,
-          rotX: 0.1, rotY: -0.2, rotZ: 0.05,
-          speedY: 0.002, speedZ: 0.001
-        },
-        {
-          type: "cpu",
-          vertices: cpuVerts,
-          edges: cpuEdges,
-          offsetX: 170,
-          offsetY: -110,
-          offsetZ: 20,
-          rotX: 0.004, rotY: 0.008, rotZ: 0.002,
-          speedY: 0.003, speedZ: 0.005
-        },
-        {
-          type: "cpu",
-          vertices: cpuVerts,
-          edges: cpuEdges,
-          offsetX: 190,
-          offsetY: 90,
-          offsetZ: -30,
-          rotX: 0.005, rotY: 0.002, rotZ: 0.007,
-          speedY: 0.004, speedZ: 0.001
-        }
-      ];
-    };
-
-    const initBinaryRain = () => {
-      binaryRain = [];
-      const colWidth = 32;
-      const colCount = Math.floor(canvas.width / colWidth);
-      for (let i = 0; i < colCount; i += 6) {
-        const chars = [];
-        const length = Math.floor(Math.random() * 4) + 3;
-        for (let j = 0; j < length; j++) {
-          chars.push(Math.random() < 0.5 ? "0" : "1");
-        }
-        binaryRain.push({
-          x: i * colWidth + Math.random() * 6,
-          y: Math.random() * -canvas.height,
-          speed: Math.random() * 1.0 + 0.6,
-          chars
-        });
-      }
-    };
-
-    const initPCBTracks = () => {
-      pcbTracks = [];
-      pcbTracks.push({
-        points: [{ x: 50, y: 160 }, { x: 180, y: 160 }, { x: 210, y: 190 }],
-        pulse: 0,
-        color: "rgba(0, 225, 255,"
-      });
-    };
-
-    const initHexClusters = () => {
-      hexClusters = [];
-      const count = 3;
-      for (let k = 0; k < count; k++) {
-        hexClusters.push({
-          x: Math.random() * (canvas.width - 200) + 100,
-          y: Math.random() * (canvas.height - 200) + 100,
-          size: Math.random() * 18 + 12,
-          alpha: 0,
-          targetAlpha: Math.random() * 0.12 + 0.03,
-          speed: Math.random() * 0.004 + 0.002
+          x: isZDirection ? offsetVal : (Math.random() - 0.5) * 800,
+          y: -2,
+          z: isZDirection ? (Math.random() - 0.5) * 800 : offsetVal,
+          speed: Math.random() * 2.5 + 2.0,
+          isZDirection,
+          isGold: Math.random() < 0.35
         });
       }
     };
@@ -1059,458 +1074,599 @@ function TechParticleCanvas({ logoRef }) {
 
     const draw = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      
+
       const centerX = canvas.width / 2;
       const centerY = canvas.height / 2;
-      time += 0.024;
-
-      // Determine logo center coordinates
-      let logoX = null;
-      let logoY = null;
-      if (logoRef && logoRef.current) {
-        const logoRect = logoRef.current.getBoundingClientRect();
-        const canvasRect = canvas.getBoundingClientRect();
-        logoX = logoRect.left - canvasRect.left + logoRect.width / 2;
-        logoY = logoRect.top - canvasRect.top + logoRect.height / 2;
-      }
-
-      const brainCenterX = logoX !== null ? logoX : (centerX + 260);
-      const brainCenterY = logoY !== null ? logoY : (centerY - 60);
-
-      // Shifting background metallic gradients
-      const purpleGlowX = centerX + Math.sin(time * 0.1) * 160;
-      const purpleGlowY = centerY + Math.cos(time * 0.12) * 120;
-      const purpleGlow = ctx.createRadialGradient(purpleGlowX, purpleGlowY, 0, purpleGlowX, purpleGlowY, 440);
-      purpleGlow.addColorStop(0, "rgba(168, 85, 247, 0.035)");
-      purpleGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
-      ctx.fillStyle = purpleGlow;
-      ctx.beginPath();
-      ctx.arc(purpleGlowX, purpleGlowY, 440, 0, Math.PI * 2);
-      ctx.fill();
-
-      const cyanGlowX = centerX - Math.cos(time * 0.08) * 190;
-      const cyanGlowY = centerY - Math.sin(time * 0.14) * 80;
-      const cyanGlow = ctx.createRadialGradient(cyanGlowX, cyanGlowY, 0, cyanGlowX, cyanGlowY, 400);
-      cyanGlow.addColorStop(0, "rgba(0, 225, 255, 0.035)");
-      cyanGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
-      ctx.fillStyle = cyanGlow;
-      ctx.beginPath();
-      ctx.arc(cyanGlowX, cyanGlowY, 400, 0, Math.PI * 2);
-      ctx.fill();
+      time += 0.015;
 
       // Parallax camera tilt angles
-      const targetAngleX = mouse.x !== null ? (mouse.y - centerY) * 0.0004 : 0;
-      const targetAngleY = mouse.x !== null ? (mouse.x - centerX) * 0.0004 : 0;
-      
-      camAngleX += (targetAngleX - camAngleX) * 0.05;
-      camAngleY += (targetAngleY - camAngleY) * 0.05;
+      const targetAngleY = (time * 0.015) + (mouse.x !== null ? (mouse.x - centerX) * 0.0003 : 0);
+      const targetAngleX = -0.32 + (mouse.y !== null ? (mouse.y - centerY) * 0.0002 : 0);
 
-      const finalAngleX = camAngleX + Math.sin(time * 0.08) * 0.015;
-      const finalAngleY = camAngleY + time * 0.0015;
+      camAngleY += (targetAngleY - camAngleY) * 0.06;
+      camAngleX += (targetAngleX - camAngleX) * 0.06;
 
-      // 1. Digital Brain Self-Assembly & Pulsating Render
-      const assemblyProgress = Math.min(1.0, time / 6.0);
-      const easeAssembly = 1 - Math.pow(1 - assemblyProgress, 3); // easeOutCubic
+      const emerge = Math.min(1.0, time / 4.0);
+      const renderQueue = [];
 
-      const brainPulse = assemblyProgress >= 1.0 ? 1.0 + 0.035 * Math.sin(time * 1.8) : 1.0;
+      // Update Flying Cars
+      cars.forEach((car) => {
+        car.history.push({ x: car.x, y: car.y, z: car.z });
+        if (car.history.length > 12) car.history.shift();
 
-      const brainProjected = brainNodes.map((p) => {
-        // Interpolate between start and wrinkled target positions
-        let x = p.startX + (p.targetX - p.startX) * easeAssembly;
-        let y = p.startY + (p.targetY - p.startY) * easeAssembly;
-        let z = p.startZ + (p.targetZ - p.startZ) * easeAssembly;
+        car.x += car.vx;
+        car.z += car.vz;
 
-        x *= brainPulse;
-        y *= brainPulse;
-        z *= brainPulse;
-
-        // Apply mouse particle attraction bend
-        if (mouse.x !== null && mouse.y !== null) {
-          const absoluteX = brainCenterX + x;
-          const absoluteY = brainCenterY + y;
-          const dx = mouse.x - absoluteX;
-          const dy = mouse.y - absoluteY;
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 140) {
-            const pull = (1 - dist / 140) * 8.0;
-            x += (dx / Math.max(1, dist)) * pull;
-            y += (dy / Math.max(1, dist)) * pull;
-          }
+        if (car.isZAxis) {
+          if (car.vz > 0 && car.z > 450) { car.z = -450; car.history = []; }
+          else if (car.vz < 0 && car.z < -450) { car.z = 450; car.history = []; }
+        } else {
+          if (car.vx > 0 && car.x > 450) { car.x = -450; car.history = []; }
+          else if (car.vx < 0 && car.x < -450) { car.x = 450; car.history = []; }
         }
-
-        // Apply rotation matrices
-        let r = rotateY(x, y, z, finalAngleY * 0.6);
-        r = rotateX(r.x, r.y, r.z, finalAngleX);
-
-        // Safe focal division denominator
-        const scale = focalLength / Math.max(1, r.z + focalLength);
-
-        return {
-          screenX: brainCenterX + r.x * scale,
-          screenY: brainCenterY + r.y * scale,
-          depthZ: r.z,
-          color: p.color,
-          scale
-        };
       });
 
-      // Render synapses (faint lines between close nodes in the brain)
-      ctx.save();
-      ctx.lineWidth = 0.5;
-      const connectionDist = 18;
-      for (let i = 0; i < brainProjected.length; i += 4) {
-        const p1 = brainProjected[i];
-        for (let j = i + 1; j < brainProjected.length; j += 6) {
-          const p2 = brainProjected[j];
-          const dx = p1.screenX - p2.screenX;
-          const dy = p1.screenY - p2.screenY;
-          const d = Math.sqrt(dx*dx + dy*dy);
-          if (d < connectionDist) {
-            ctx.strokeStyle = "rgba(0, 225, 255, " + (0.05 * Math.min(p1.scale, p2.scale)) + ")";
-            ctx.beginPath();
-            ctx.moveTo(p1.screenX, p1.screenY);
-            ctx.lineTo(p2.screenX, p2.screenY);
-            ctx.stroke();
-          }
+      // Update Highway Particles
+      particles.forEach((p) => {
+        if (p.isZDirection) {
+          p.z += p.speed;
+          if (p.z > 400) p.z = -400;
+        } else {
+          p.x += p.speed;
+          if (p.x > 400) p.x = -400;
         }
+      });
+
+      // Trigger Lightning
+      if (!lightning && Math.random() < 0.003) {
+        const startX = (Math.random() - 0.5) * 600;
+        const startZ = (Math.random() - 0.5) * 600;
+        const startY = -400;
+
+        let endX = (Math.random() - 0.5) * 400;
+        let endZ = (Math.random() - 0.5) * 400;
+        let endY = 0;
+
+        if (buildings.length > 0) {
+          const b = buildings[Math.floor(Math.random() * buildings.length)];
+          endX = b.x;
+          endZ = b.z;
+          endY = -b.h * emerge;
+        }
+
+        const segments = [];
+        const steps = 10;
+        for (let i = 0; i <= steps; i++) {
+          const t = i / steps;
+          const tx = startX + (endX - startX) * t + (Math.random() - 0.5) * 35;
+          const ty = startY + (endY - startY) * t + (Math.random() - 0.5) * 15;
+          const tz = startZ + (endZ - startZ) * t + (Math.random() - 0.5) * 35;
+          segments.push({ x: tx, y: ty, z: tz });
+        }
+
+        lightning = { segments, timer: 8 };
       }
-      ctx.restore();
 
-      // Render brain particles
-      brainProjected.sort((a, b) => b.depthZ - a.depthZ);
-      for (let i = 0; i < brainProjected.length; i++) {
-        const pt = brainProjected[i];
-        ctx.beginPath();
-        const rawSize = pt.depthZ <= 0 ? 1.5 * pt.scale : 0.8 * pt.scale;
-        const size = Math.max(0.1, rawSize);
-        ctx.arc(pt.screenX, pt.screenY, size, 0, Math.PI * 2);
-        const opacity = pt.depthZ <= 0 ? 0.45 : 0.12;
-        ctx.fillStyle = pt.color + (opacity * pt.scale) + ")";
-        ctx.fill();
+      if (lightning) {
+        lightning.timer--;
+        if (lightning.timer <= 0) lightning = null;
       }
 
-      // 2. Faint sweeping laser scan planes
-      ctx.save();
-      const laserY = (time * 80) % (canvas.height + 400) - 200;
-      const laserGrad = ctx.createLinearGradient(0, laserY, 0, laserY + 14);
-      laserGrad.addColorStop(0, "rgba(0, 225, 255, 0)");
-      laserGrad.addColorStop(0.5, "rgba(0, 225, 255, 0.04)");
-      laserGrad.addColorStop(1, "rgba(0, 225, 255, 0)");
-      ctx.fillStyle = laserGrad;
-      ctx.fillRect(0, laserY, canvas.width, 14);
-      ctx.restore();
+      // Add Buildings to Render Queue
+      buildings.forEach((b) => {
+        const h = b.h * emerge;
+        const halfW = b.w / 2;
+        const halfD = b.d / 2;
 
-      // 3. Conformal background coordinate grid
+        const baseCorners = [
+          { x: b.x - halfW, y: 0, z: b.z - halfD },
+          { x: b.x + halfW, y: 0, z: b.z - halfD },
+          { x: b.x + halfW, y: 0, z: b.z + halfD },
+          { x: b.x - halfW, y: 0, z: b.z + halfD }
+        ];
+
+        const topCorners = [
+          { x: b.x - halfW, y: -h, z: b.z - halfD },
+          { x: b.x + halfW, y: -h, z: b.z - halfD },
+          { x: b.x + halfW, y: -h, z: b.z + halfD },
+          { x: b.x - halfW, y: -h, z: b.z + halfD }
+        ];
+
+        const refTopCorners = [
+          { x: b.x - halfW, y: h, z: b.z - halfD },
+          { x: b.x + halfW, y: h, z: b.z - halfD },
+          { x: b.x + halfW, y: h, z: b.z + halfD },
+          { x: b.x - halfW, y: h, z: b.z + halfD }
+        ];
+
+        const pB = baseCorners.map(c => project(c.x, c.y, c.z));
+        const pT = topCorners.map(c => project(c.x, c.y, c.z));
+        const pR = refTopCorners.map(c => project(c.x, c.y, c.z));
+
+        const avgZ = pB.reduce((sum, p) => sum + p.z, 0) / 4;
+
+        // Reflection
+        renderQueue.push({
+          depthZ: avgZ + 15,
+          draw: () => {
+            ctx.save();
+            const strokeColor = b.isGold ? "rgba(197, 160, 89, 0.03)" : "rgba(0, 225, 255, 0.03)";
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 0.5;
+
+            // Reflect Base
+            ctx.beginPath();
+            ctx.moveTo(pB[0].x, pB[0].y);
+            pB.forEach(p => ctx.lineTo(p.x, p.y));
+            ctx.closePath();
+            ctx.stroke();
+
+            // Reflect Top
+            ctx.beginPath();
+            ctx.moveTo(pR[0].x, pR[0].y);
+            pR.forEach(p => ctx.lineTo(p.x, p.y));
+            ctx.closePath();
+            ctx.stroke();
+
+            // Reflect vertical columns
+            ctx.beginPath();
+            for (let i = 0; i < 4; i++) {
+              ctx.moveTo(pB[i].x, pB[i].y);
+              ctx.lineTo(pR[i].x, pR[i].y);
+            }
+            ctx.stroke();
+            ctx.restore();
+          }
+        });
+
+        // Building
+        renderQueue.push({
+          depthZ: avgZ,
+          draw: () => {
+            ctx.save();
+            const colorPrefix = b.isGold ? "rgba(197, 160, 89, " : "rgba(0, 225, 255, ";
+
+            // Wireframe Base Outline
+            ctx.strokeStyle = colorPrefix + "0.15)";
+            ctx.lineWidth = 0.7;
+            ctx.beginPath();
+            ctx.moveTo(pB[0].x, pB[0].y);
+            pB.forEach(p => ctx.lineTo(p.x, p.y));
+            ctx.closePath();
+            ctx.stroke();
+
+            // Wireframe Top Outline
+            ctx.strokeStyle = colorPrefix + "0.45)";
+            ctx.lineWidth = 1.0;
+            ctx.beginPath();
+            ctx.moveTo(pT[0].x, pT[0].y);
+            pT.forEach(p => ctx.lineTo(p.x, p.y));
+            ctx.closePath();
+            ctx.stroke();
+
+            // Columns
+            ctx.strokeStyle = colorPrefix + "0.22)";
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            for (let i = 0; i < 4; i++) {
+              ctx.moveTo(pB[i].x, pB[i].y);
+              ctx.lineTo(pT[i].x, pT[i].y);
+            }
+            ctx.stroke();
+
+            // Circuit tracks running along building surfaces
+            ctx.strokeStyle = colorPrefix + "0.38)";
+            ctx.lineWidth = 0.5;
+            b.lines.forEach((l) => {
+              const yOffset = ((l.offset + time * l.speed * 20) % h);
+              const yTop = -yOffset;
+              const yBot = Math.min(0, yTop + l.length);
+
+              const pLineTop = project(b.x + l.offsetX, yTop, b.z + l.offsetZ);
+              const pLineBot = project(b.x + l.offsetX, yBot, b.z + l.offsetZ);
+
+              ctx.beginPath();
+              ctx.moveTo(pLineTop.x, pLineTop.y);
+              ctx.lineTo(pLineBot.x, pLineBot.y);
+              ctx.stroke();
+
+              // Circuit head glow
+              ctx.fillStyle = b.isGold ? "#e5c17b" : "#00e1ff";
+              ctx.beginPath();
+              ctx.arc(pLineTop.x, pLineTop.y, 1.2 * pLineTop.scale, 0, Math.PI * 2);
+              ctx.fill();
+            });
+
+            // Holographic floor rings
+            ctx.strokeStyle = colorPrefix + "0.06)";
+            ctx.lineWidth = 0.5;
+            const floorCount = 5;
+            for (let f = 1; f <= floorCount; f++) {
+              const fh = -h * (f / floorCount);
+              const pf1 = project(b.x - halfW, fh, b.z - halfD);
+              const pf2 = project(b.x + halfW, fh, b.z - halfD);
+              const pf3 = project(b.x + halfW, fh, b.z + halfD);
+              const pf4 = project(b.x - halfW, fh, b.z + halfD);
+
+              ctx.beginPath();
+              ctx.moveTo(pf1.x, pf1.y);
+              ctx.lineTo(pf2.x, pf2.y);
+              ctx.lineTo(pf3.x, pf3.y);
+              ctx.lineTo(pf4.x, pf4.y);
+              ctx.closePath();
+              ctx.stroke();
+            }
+
+            ctx.restore();
+          }
+        });
+      });
+
+      // Add Screens to Render Queue
+      screens.forEach((s) => {
+        const halfW = s.w / 2;
+        const halfH = s.h / 2;
+        const cosY = Math.cos(s.rotY);
+        const sinY = Math.sin(s.rotY);
+
+        const getCoords = (lx, ly) => {
+          return {
+            x: s.x + lx * cosY,
+            y: s.y + ly,
+            z: s.z + lx * sinY
+          };
+        };
+
+        const corners = [
+          getCoords(-halfW, -halfH),
+          getCoords(halfW, -halfH),
+          getCoords(halfW, halfH),
+          getCoords(-halfW, halfH)
+        ];
+
+        const pC = corners.map(c => project(c.x, c.y, c.z));
+        const avgZ = pC.reduce((sum, p) => sum + p.z, 0) / 4;
+
+        renderQueue.push({
+          depthZ: avgZ,
+          draw: () => {
+            ctx.save();
+
+            // Draw Screen Surface
+            ctx.beginPath();
+            ctx.moveTo(pC[0].x, pC[0].y);
+            pC.forEach(p => ctx.lineTo(p.x, p.y));
+            ctx.closePath();
+
+            const screenGrad = ctx.createLinearGradient(pC[0].x, pC[0].y, pC[2].x, pC[2].y);
+            screenGrad.addColorStop(0, "rgba(0, 225, 255, 0.04)");
+            screenGrad.addColorStop(1, "rgba(197, 160, 89, 0.015)");
+            ctx.fillStyle = screenGrad;
+            ctx.fill();
+
+            // Screen Border Glow
+            ctx.strokeStyle = "rgba(0, 225, 255, 0.28)";
+            ctx.lineWidth = 0.8;
+            ctx.stroke();
+
+            // Draw content inside screen
+            if (s.type === "sine") {
+              ctx.strokeStyle = "rgba(197, 160, 89, 0.4)";
+              ctx.lineWidth = 0.8;
+              ctx.beginPath();
+              const steps = 14;
+              for (let i = 0; i <= steps; i++) {
+                const t = i / steps;
+                const lx = -halfW + t * s.w;
+                const ly = Math.sin(t * Math.PI * 4 + time * 3) * (halfH * 0.5);
+                const wCoord = getCoords(lx, ly);
+                const pt = project(wCoord.x, wCoord.y, wCoord.z);
+                if (i === 0) ctx.moveTo(pt.x, pt.y);
+                else ctx.lineTo(pt.x, pt.y);
+              }
+              ctx.stroke();
+            } else if (s.type === "matrix") {
+              ctx.fillStyle = "rgba(0, 225, 255, 0.35)";
+              ctx.font = `${Math.max(4, 5.5 * pC[0].scale)}px monospace`;
+              const cols = 5;
+              const rows = 4;
+              for (let c = 0; c < cols; c++) {
+                for (let r = 0; r < rows; r++) {
+                  const tx = -halfW + (c / cols) * s.w + s.w * 0.1;
+                  const ty = -halfH + (r / rows) * s.h + s.h * 0.15;
+                  const wCoord = getCoords(tx, ty);
+                  const pt = project(wCoord.x, wCoord.y, wCoord.z);
+                  const char = Math.random() < 0.5 ? "0" : "1";
+                  ctx.fillText(char, pt.x, pt.y);
+                }
+              }
+            } else {
+              // Cyber grid display
+              ctx.strokeStyle = "rgba(0, 225, 255, 0.08)";
+              ctx.lineWidth = 0.5;
+              const gridLines = 4;
+              for (let g = 1; g < gridLines; g++) {
+                const t = g / gridLines;
+                const pTop = project(corners[0].x + t * (corners[1].x - corners[0].x), corners[0].y, corners[0].z + t * (corners[1].z - corners[0].z));
+                const pBot = project(corners[3].x + t * (corners[2].x - corners[3].x), corners[3].y, corners[3].z + t * (corners[2].z - corners[3].z));
+                ctx.beginPath();
+                ctx.moveTo(pTop.x, pTop.y);
+                ctx.lineTo(pBot.x, pBot.y);
+                ctx.stroke();
+              }
+            }
+            ctx.restore();
+          }
+        });
+      });
+
+      // Add Drones to Render Queue
+      drones.forEach((d) => {
+        const dx = d.cx + Math.cos(time * 2 + d.phase) * d.radius;
+        const dz = d.cz + Math.sin(time * 1.5 + d.phase) * d.radius;
+        const dy = d.cy + Math.sin(time * 3 + d.phase) * 12;
+
+        const pDrone = project(dx, dy, dz);
+        const avgZ = pDrone.z;
+
+        renderQueue.push({
+          depthZ: avgZ,
+          draw: () => {
+            ctx.save();
+            const size = 5.5 * pDrone.scale;
+            ctx.strokeStyle = "rgba(0, 225, 255, 0.4)";
+            ctx.lineWidth = 1.0;
+
+            ctx.beginPath();
+            ctx.moveTo(pDrone.x - size, pDrone.y);
+            ctx.lineTo(pDrone.x + size, pDrone.y);
+            ctx.moveTo(pDrone.x, pDrone.y - size * 0.5);
+            ctx.lineTo(pDrone.x, pDrone.y + size * 0.5);
+            ctx.stroke();
+
+            // Blinking rotor navigation lights
+            const flashGreen = Math.sin(time * 12 + d.phase) > 0;
+            ctx.fillStyle = flashGreen ? "#22c55e" : "#ef4444";
+            ctx.beginPath();
+            ctx.arc(pDrone.x - size, pDrone.y, 1.2 * pDrone.scale, 0, Math.PI * 2);
+            ctx.arc(pDrone.x + size, pDrone.y, 1.2 * pDrone.scale, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+          }
+        });
+      });
+
+      // Add Satellites to Render Queue
+      satellites.forEach((s) => {
+        s.angle += s.rotSpeed;
+        const pSat = project(s.x, s.y, s.z);
+        const avgZ = pSat.z;
+
+        renderQueue.push({
+          depthZ: avgZ,
+          draw: () => {
+            ctx.save();
+            ctx.strokeStyle = "rgba(197, 160, 89, 0.35)";
+            ctx.lineWidth = 0.8;
+
+            const wingLength = s.size * pSat.scale;
+            const cosA = Math.cos(s.angle);
+            const sinA = Math.sin(s.angle);
+
+            const xLeft = pSat.x - wingLength * cosA;
+            const yLeft = pSat.y - wingLength * sinA * 0.3;
+            const xRight = pSat.x + wingLength * cosA;
+            const yRight = pSat.y + wingLength * sinA * 0.3;
+
+            // Boom axis
+            ctx.beginPath();
+            ctx.moveTo(xLeft, yLeft);
+            ctx.lineTo(xRight, yRight);
+            ctx.stroke();
+
+            // Panel Wings
+            const pSize = 7.5 * pSat.scale;
+            ctx.fillStyle = "rgba(0, 225, 255, 0.08)";
+            ctx.fillRect(xLeft - pSize, yLeft - pSize/2, pSize*2, pSize);
+            ctx.strokeRect(xLeft - pSize, yLeft - pSize/2, pSize*2, pSize);
+            ctx.fillRect(xRight - pSize, yRight - pSize/2, pSize*2, pSize);
+            ctx.strokeRect(xRight - pSize, yRight - pSize/2, pSize*2, pSize);
+
+            // Center Dish
+            ctx.beginPath();
+            ctx.ellipse(pSat.x, pSat.y, 9 * pSat.scale, 5.5 * pSat.scale, s.angle * 0.1, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(197, 160, 89, 0.1)";
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.restore();
+          }
+        });
+      });
+
+      // Add Cars and Trails to Render Queue
+      cars.forEach((car) => {
+        const pCar = project(car.x, car.y, car.z);
+        const avgZ = pCar.z;
+
+        renderQueue.push({
+          depthZ: avgZ,
+          draw: () => {
+            ctx.save();
+            const colorPrefix = car.isGold ? "rgba(197, 160, 89, " : "rgba(0, 225, 255, ";
+
+            // Draw long trailing neon path
+            if (car.history.length > 1) {
+              ctx.beginPath();
+              const startPt = project(car.history[0].x, car.history[0].y, car.history[0].z);
+              ctx.moveTo(startPt.x, startPt.y);
+              for (let j = 1; j < car.history.length; j++) {
+                const pt = project(car.history[j].x, car.history[j].y, car.history[j].z);
+                ctx.lineTo(pt.x, pt.y);
+              }
+              const trailGrad = ctx.createLinearGradient(startPt.x, startPt.y, pCar.x, pCar.y);
+              trailGrad.addColorStop(0, colorPrefix + "0.0)");
+              trailGrad.addColorStop(1, colorPrefix + "0.6)");
+              ctx.strokeStyle = trailGrad;
+              ctx.lineWidth = 1.6 * pCar.scale;
+              ctx.stroke();
+            }
+
+            // Glow Car Point
+            ctx.fillStyle = car.isGold ? "#e5c17b" : "#00e1ff";
+            ctx.beginPath();
+            ctx.arc(pCar.x, pCar.y, 2.2 * pCar.scale, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Blinking tail light
+            if (Math.sin(time * 10 + car.x) > 0) {
+              ctx.fillStyle = "rgba(239, 68, 68, 0.85)";
+              ctx.beginPath();
+              ctx.arc(pCar.x - (car.vx * 0.7), pCar.y - (car.vz * 0.7), 1.0 * pCar.scale, 0, Math.PI * 2);
+              ctx.fill();
+            }
+            ctx.restore();
+          }
+        });
+      });
+
+      // 1. Draw Digital Highway Grid on Ground (Y = 0)
       ctx.save();
-      ctx.strokeStyle = "rgba(255, 255, 255, 0.007)";
-      ctx.lineWidth = 0.5;
-      const spacing = 80;
+      ctx.strokeStyle = "rgba(0, 225, 255, 0.015)";
+      ctx.lineWidth = 0.6;
+      const roadSpacing = 75;
       ctx.beginPath();
-      for (let x = spacing; x < canvas.width; x += spacing) {
-        ctx.moveTo(x, 0);
-        ctx.lineTo(x, canvas.height);
+      for (let x = -400; x <= 400; x += roadSpacing) {
+        const p1 = project(x, 0, -400);
+        const p2 = project(x, 0, 400);
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
       }
-      for (let y = spacing; y < canvas.height; y += spacing) {
-        ctx.moveTo(0, y);
-        ctx.lineTo(canvas.width, y);
+      for (let z = -400; z <= 400; z += roadSpacing) {
+        const p1 = project(-400, 0, z);
+        const p2 = project(400, 0, z);
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
       }
       ctx.stroke();
       ctx.restore();
 
-      // 4. Binary code rain columns
-      ctx.save();
-      ctx.font = "8px monospace";
-      for (let i = 0; i < binaryRain.length; i++) {
-        const drop = binaryRain[i];
-        drop.y += drop.speed;
-        if (drop.y > canvas.height) {
-          drop.y = -80;
-          drop.x = Math.random() * canvas.width;
-        }
+      // 2. Draw Highway Particles
+      drawHighwayParticles();
 
-        for (let j = 0; j < drop.chars.length; j++) {
-          const cy = drop.y - j * 12;
-          if (cy >= 0 && cy <= canvas.height) {
-            const alpha = (1 - j / drop.chars.length) * 0.04;
-            ctx.fillStyle = "rgba(0, 225, 255, " + alpha + ")";
-            ctx.fillText(drop.chars[j], drop.x, cy);
-          }
-        }
-      }
-      ctx.restore();
+      // 3. Sort and Draw all isometric perspective elements (Far to Near depthZ descending)
+      renderQueue.sort((a, b) => b.depthZ - a.depthZ);
+      renderQueue.forEach(item => item.draw());
 
-      // 5. Drifting spark micro-particles
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i];
-        const flowAngle = time * 0.3 + p.angleOffset;
-        p.x += Math.sin(flowAngle) * p.speed + 0.12;
-        p.y += Math.cos(flowAngle) * p.speed - p.speed * 0.08;
-        
-        if (p.y < -300) p.y = 300;
-        if (p.x > 400) p.x = -400;
-
-        if (mouse.x !== null && mouse.y !== null) {
-          const dx = mouse.x - (centerX + p.x);
-          const dy = mouse.y - (centerY + p.y);
-          const dist = Math.sqrt(dx * dx + dy * dy);
-          if (dist < 180) {
-            const pull = (1 - dist / 180) * 0.12;
-            p.x += (dx / Math.max(1, dist)) * pull;
-            p.y += (dy / Math.max(1, dist)) * pull;
-          }
-        }
-
-        let rotated = rotateY(p.x, p.y, p.z, finalAngleY);
-        rotated = rotateX(rotated.x, rotated.y, rotated.z, finalAngleX);
-
-        const pZ = rotated.z + focalLength;
-        const scale = focalLength / Math.max(1, pZ);
-        const px = centerX + rotated.x * scale;
-        const py = centerY + rotated.y * scale;
-
+      // 4. Draw Jagged lightning flashes
+      if (lightning) {
+        ctx.save();
+        ctx.strokeStyle = Math.random() < 0.55 ? "rgba(255, 255, 255, 0.95)" : "rgba(0, 225, 255, 0.92)";
+        ctx.lineWidth = (lightning.timer / 2.5) + 0.6;
         ctx.beginPath();
-        ctx.arc(px, py, Math.max(0.1, p.size * scale), 0, Math.PI * 2);
-        ctx.fillStyle = p.color + (0.32 * Math.min(1.0, scale)) + ")";
-        ctx.fill();
-      }
-
-      // 6. Holographic Calibration circles framing the brain
-      ctx.save();
-      ctx.strokeStyle = "rgba(0, 225, 255, 0.05)";
-      ctx.lineWidth = 0.75;
-      const calibrationRadii = [70, 115, 165];
-      calibrationRadii.forEach((r, idx) => {
-        ctx.beginPath();
-        ctx.arc(brainCenterX, brainCenterY, r, 0, Math.PI * 2);
+        const pStart = project(lightning.segments[0].x, lightning.segments[0].y, lightning.segments[0].z);
+        ctx.moveTo(pStart.x, pStart.y);
+        for (let j = 1; j < lightning.segments.length; j++) {
+          const pt = project(lightning.segments[j].x, lightning.segments[j].y, lightning.segments[j].z);
+          ctx.lineTo(pt.x, pt.y);
+        }
         ctx.stroke();
 
-        if (idx === 1) {
-          ctx.strokeStyle = "rgba(0, 225, 255, 0.1)";
-          for (let a = 0; a < Math.PI * 2; a += Math.PI / 10) {
-            const rotA = a + time * 0.02;
-            ctx.beginPath();
-            ctx.moveTo(brainCenterX + Math.cos(rotA) * (r - 4), brainCenterY + Math.sin(rotA) * (r - 4));
-            ctx.lineTo(brainCenterX + Math.cos(rotA) * r, brainCenterY + Math.sin(rotA) * r);
-            ctx.stroke();
-          }
-        }
-      });
-      ctx.restore();
-
-      // 7. Render shapes (rotating 3D wireframe chips and panels)
-      for (let sIdx = 0; sIdx < shapes.length; sIdx++) {
-        const shape = shapes[sIdx];
-        
-        if (shape.speedX) shape.rotX += shape.speedX;
-        shape.rotY += shape.speedY;
-        shape.rotZ += shape.speedZ;
-
-        const shapeProjected = [];
-
-        for (let vIdx = 0; vIdx < shape.vertices.length; vIdx++) {
-          const vert = shape.vertices[vIdx];
-          
-          let v = rotateX(vert.x, vert.y, vert.z, shape.rotX);
-          v = rotateY(v.x, v.y, v.z, shape.rotY);
-          v = rotateZ(v.x, v.y, v.z, shape.rotZ);
-          
-          const wx = v.x + shape.offsetX;
-          const wy = v.y + shape.offsetY;
-          const wz = v.z + shape.offsetZ;
-
-          let r = rotateY(wx, wy, wz, finalAngleY);
-          r = rotateX(r.x, r.y, r.z, finalAngleX);
-
-          const pZ = r.z + focalLength;
-          const scale = focalLength / Math.max(1, pZ);
-
-          shapeProjected.push({
-            x: centerX + r.x * scale,
-            y: centerY + r.y * scale,
-            scale
-          });
-        }
-
-        const avgScale = shapeProjected.reduce((sum, pt) => sum + pt.scale, 0) / shapeProjected.length;
-
-        if (shape.type === "glass") {
-          ctx.beginPath();
-          ctx.moveTo(shapeProjected[0].x, shapeProjected[0].y);
-          for (let j = 1; j < shapeProjected.length; j++) {
-            ctx.lineTo(shapeProjected[j].x, shapeProjected[j].y);
-          }
-          ctx.closePath();
-
-          const panelGrad = ctx.createLinearGradient(
-            shapeProjected[0].x, shapeProjected[0].y, 
-            shapeProjected[2].x, shapeProjected[2].y
-          );
-          panelGrad.addColorStop(0, "rgba(255, 255, 255, 0.015)");
-          panelGrad.addColorStop(1, "rgba(0, 225, 255, 0.005)");
-          ctx.fillStyle = panelGrad;
-          ctx.fill();
-
-          let lineAlpha = 0.065;
-          if (mouse.x !== null && mouse.y !== null) {
-            const mDist = Math.sqrt((shapeProjected[0].x - mouse.x)*(shapeProjected[0].x - mouse.x) + (shapeProjected[0].y - mouse.y)*(shapeProjected[0].y - mouse.y));
-            if (mDist < 130) lineAlpha = 0.065 + (1 - mDist / 130) * 0.18;
-          }
-
-          ctx.strokeStyle = "rgba(0, 225, 255, " + (lineAlpha * avgScale) + ")";
-          ctx.lineWidth = 0.8;
-          ctx.stroke();
-
-          ctx.save();
-          ctx.clip();
-          
-          const sheenX = (time * 150) % (canvas.width + 400) - 200;
-          const sheenGrad = ctx.createLinearGradient(sheenX, 0, sheenX + 60, 0);
-          sheenGrad.addColorStop(0, "rgba(255, 255, 255, 0)");
-          sheenGrad.addColorStop(0.5, "rgba(255, 255, 255, 0.038)");
-          sheenGrad.addColorStop(1, "rgba(255, 255, 255, 0)");
-          
-          ctx.fillStyle = sheenGrad;
-          ctx.fillRect(-canvas.width, -canvas.height, canvas.width * 3, canvas.height * 3);
-          ctx.restore();
-        } else {
-          ctx.save();
-          ctx.lineWidth = 0.75;
-          ctx.strokeStyle = "rgba(0, 225, 255, " + (0.16 * avgScale) + ")";
-          
-          for (let eIdx = 0; eIdx < shape.edges.length; eIdx++) {
-            const edge = shape.edges[eIdx];
-            const p1 = shapeProjected[edge[0]];
-            const p2 = shapeProjected[edge[1]];
-
-            if (p1 && p2) {
-              ctx.beginPath();
-              ctx.moveTo(p1.x, p1.y);
-              ctx.lineTo(p2.x, p2.y);
-              ctx.stroke();
-            }
-          }
-          ctx.restore();
-
-          for (let vIdx = 0; vIdx < shapeProjected.length; vIdx++) {
-            const pt = shapeProjected[vIdx];
-            ctx.beginPath();
-            ctx.arc(pt.x, pt.y, Math.max(0.1, 1.0 * pt.scale), 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(168, 85, 247, " + (0.35 * pt.scale) + ")";
-            ctx.fill();
-          }
-
-          // Circuit routing pathway from brain center to outer technology shapes
-          const iconCenterX = shapeProjected.reduce((sum, pt) => sum + pt.x, 0) / shapeProjected.length;
-          const iconCenterY = shapeProjected.reduce((sum, pt) => sum + pt.y, 0) / shapeProjected.length;
-
-          ctx.save();
-          ctx.strokeStyle = "rgba(0, 225, 255, 0.05)";
-          ctx.lineWidth = 0.8;
-          ctx.beginPath();
-          ctx.moveTo(brainCenterX, brainCenterY);
-          const midX = (brainCenterX + iconCenterX) / 2;
-          ctx.lineTo(midX, brainCenterY);
-          ctx.lineTo(midX, iconCenterY);
-          ctx.lineTo(iconCenterX, iconCenterY);
-          ctx.stroke();
-
-          const pOffset = (time * 0.25 + sIdx * 0.5) % 1.0;
-          let px = brainCenterX;
-          let py = brainCenterY;
-          if (pOffset < 0.33) {
-            const r = pOffset / 0.33;
-            px = brainCenterX + (midX - brainCenterX) * r;
-            py = brainCenterY;
-          } else if (pOffset < 0.66) {
-            const r = (pOffset - 0.33) / 0.33;
-            px = midX;
-            py = brainCenterY + (iconCenterY - brainCenterY) * r;
-          } else {
-            const r = (pOffset - 0.66) / 0.34;
-            px = midX + (iconCenterX - midX) * r;
-            py = iconCenterY;
-          }
-
-          ctx.beginPath();
-          ctx.arc(px, py, 1.8, 0, Math.PI * 2);
-          ctx.fillStyle = "#ffffff";
-          ctx.shadowBlur = 8;
-          ctx.shadowColor = "rgba(0, 225, 255, 1)";
-          ctx.fill();
-          ctx.shadowBlur = 0;
-          ctx.restore();
-        }
+        // Sky flash flare
+        ctx.fillStyle = "rgba(0, 225, 255, 0.07)";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.restore();
       }
 
-      // 8. Telemetry overlay text telemetry
+      // 5. Draw Cyber HUD Telemetry text
       ctx.save();
       ctx.font = "9px monospace";
       ctx.fillStyle = "rgba(0, 225, 255, 0.22)";
-      
       const hudMargin = 30;
-      ctx.fillText("[ NEURAL_NET: ACTIVE ]", hudMargin, hudMargin + 10);
-      ctx.fillText("[ COGNITIVE: ONLINE ]", hudMargin, hudMargin + 22);
+      ctx.fillText("[ DISTRICT_7: ACTIVE ]", hudMargin, hudMargin + 10);
+      ctx.fillText("[ GRID_CORE: ONLINE ]", hudMargin, hudMargin + 22);
       ctx.beginPath();
       ctx.moveTo(hudMargin - 6, hudMargin);
-      ctx.lineTo(hudMargin + 85, hudMargin);
+      ctx.lineTo(hudMargin + 95, hudMargin);
       ctx.moveTo(hudMargin - 6, hudMargin);
       ctx.lineTo(hudMargin - 6, hudMargin + 30);
       ctx.strokeStyle = "rgba(0, 225, 255, 0.15)";
       ctx.stroke();
 
       const trOffset = canvas.width - hudMargin - 150;
-      ctx.fillText("[ COMP_UNITS: OK ]", trOffset, hudMargin + 10);
-      ctx.fillText("[ DECISION_GRID: 1 ]", trOffset, hudMargin + 22);
+      ctx.fillText("[ COGNITIVE: PASS ]", trOffset, hudMargin + 10);
+      ctx.fillText("[ PARALLAX_SENS: OK ]", trOffset, hudMargin + 22);
       ctx.beginPath();
       ctx.moveTo(canvas.width - hudMargin + 6, hudMargin);
-      ctx.lineTo(canvas.width - hudMargin - 85, hudMargin);
+      ctx.lineTo(canvas.width - hudMargin - 95, hudMargin);
       ctx.moveTo(canvas.width - hudMargin + 6, hudMargin);
       ctx.lineTo(canvas.width - hudMargin + 6, hudMargin + 30);
       ctx.stroke();
       ctx.restore();
 
-      // 9. Mathematical waves drifting at bottom boundary
+      // 6. Volumetric Fog Gradient (Dark blue fading bottom up)
       ctx.save();
-      ctx.lineWidth = 0.85;
-      
-      // Wave 1: Cyan
-      ctx.strokeStyle = "rgba(0, 225, 255, 0.07)";
-      ctx.beginPath();
-      for (let x = 0; x < canvas.width; x += 20) {
-        const y = centerY + 120 + Math.sin(x * 0.0035 + time * 0.8) * 16 + Math.cos(x * 0.001 - time * 0.4) * 6;
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
-
-      // Wave 2: Gold
-      ctx.strokeStyle = "rgba(197, 160, 89, 0.06)";
-      ctx.beginPath();
-      for (let x = 0; x < canvas.width; x += 20) {
-        const y = centerY + 135 + Math.sin(x * 0.002 - time * 0.6) * 14 + Math.cos(x * 0.003 + time * 0.5) * 5;
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
+      const fogHeight = 220;
+      const fogGrad = ctx.createLinearGradient(0, canvas.height - fogHeight, 0, canvas.height);
+      fogGrad.addColorStop(0, "rgba(4, 7, 18, 0)");
+      fogGrad.addColorStop(0.5, "rgba(4, 7, 18, 0.65)");
+      fogGrad.addColorStop(1, "rgba(4, 7, 18, 1.0)");
+      ctx.fillStyle = fogGrad;
+      ctx.fillRect(0, canvas.height - fogHeight, canvas.width, fogHeight);
       ctx.restore();
 
-      // 10. Spotlight scanning sweep
-      if (mouse.x !== null && mouse.y !== null) {
-        const spotlight = ctx.createRadialGradient(
-          mouse.x, mouse.y, 0,
-          mouse.x, mouse.y, 140
-        );
-        spotlight.addColorStop(0, "rgba(0, 225, 255, 0.045)");
-        spotlight.addColorStop(0.5, "rgba(168, 85, 247, 0.015)");
-        spotlight.addColorStop(1, "rgba(0, 0, 0, 0)");
-        
-        ctx.fillStyle = spotlight;
+      // 7. Cinematic Lens Flare Simulation
+      const lightSource = { x: 0, y: -650, z: 200 };
+      const pLight = project(lightSource.x, lightSource.y, lightSource.z);
+      if (pLight.z > 0 && pLight.x >= -100 && pLight.x <= canvas.width + 100) {
+        ctx.save();
+        // Central Light Sun bloom
+        const sunGlow = ctx.createRadialGradient(pLight.x, pLight.y, 0, pLight.x, pLight.y, 160 * pLight.scale);
+        sunGlow.addColorStop(0, "rgba(0, 225, 255, 0.08)");
+        sunGlow.addColorStop(0.3, "rgba(197, 160, 89, 0.035)");
+        sunGlow.addColorStop(1, "rgba(0, 0, 0, 0)");
+        ctx.fillStyle = sunGlow;
         ctx.beginPath();
-        ctx.arc(mouse.x, mouse.y, 140, 0, Math.PI * 2);
+        ctx.arc(pLight.x, pLight.y, 160 * pLight.scale, 0, Math.PI * 2);
         ctx.fill();
+
+        // Secondary flare rings reflecting along focal axis line
+        const dx = centerX - pLight.x;
+        const dy = centerY - pLight.y;
+
+        const drawFlare = (ratio, radius, color) => {
+          const fx = pLight.x + dx * ratio;
+          const fy = pLight.y + dy * ratio;
+          const glow = ctx.createRadialGradient(fx, fy, 0, fx, fy, radius);
+          glow.addColorStop(0, color);
+          glow.addColorStop(1, "rgba(0, 0, 0, 0)");
+          ctx.fillStyle = glow;
+          ctx.beginPath();
+          ctx.arc(fx, fy, radius, 0, Math.PI * 2);
+          ctx.fill();
+        };
+
+        drawFlare(0.45, 12 * pLight.scale, "rgba(197, 160, 89, 0.04)");
+        drawFlare(0.78, 25 * pLight.scale, "rgba(0, 225, 255, 0.035)");
+        drawFlare(1.25, 38 * pLight.scale, "rgba(197, 160, 89, 0.03)");
+        drawFlare(1.65, 18 * pLight.scale, "rgba(0, 225, 255, 0.025)");
+
+        ctx.restore();
       }
 
       animationFrameId = requestAnimationFrame(draw);
+    };
+
+    const drawHighwayParticles = () => {
+      ctx.save();
+      particles.forEach((p) => {
+        const pPt = project(p.x, p.y, p.z);
+        ctx.fillStyle = p.isGold ? "rgba(197, 160, 89, 0.58)" : "rgba(0, 225, 255, 0.58)";
+        ctx.beginPath();
+        ctx.arc(pPt.x, pPt.y, 1.4 * pPt.scale, 0, Math.PI * 2);
+        ctx.fill();
+      });
+      ctx.restore();
     };
 
     draw();
@@ -1540,4 +1696,3 @@ function TechParticleCanvas({ logoRef }) {
     />
   );
 }
-
