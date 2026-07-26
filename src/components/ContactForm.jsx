@@ -233,8 +233,12 @@ export default function ContactForm() {
         }
 
         @media (max-width: 600px) {
+          .contact-form-container {
+            padding: 24px 16px;
+          }
           .form-grid {
             grid-template-columns: 1fr;
+            gap: 15px;
           }
         }
 

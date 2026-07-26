@@ -225,6 +225,7 @@ button, input, textarea, select {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid var(--border-glass-blue);
+  border-left: 3px solid var(--color-gold); /* Sleek golden line on the side at all times */
   border-radius: 8px;
   padding: 30px;
   box-shadow: var(--shadow-premium);

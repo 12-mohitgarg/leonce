@@ -302,14 +302,35 @@ const styleStyle = (
     }
 
     @media (max-width: 600px) {
+      .page-header {
+        padding: 60px 16px;
+      }
+      .contact-main-grid {
+        gap: 30px;
+      }
       .contact-detail-card {
         padding: 15px;
+        gap: 12px;
       }
       .contact-social-row {
-        flex-wrap: wrap;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 10px;
+      }
+      .contact-social-row a {
+        padding: 8px 12px;
+        font-size: 0.8rem;
+        justify-content: center;
       }
       .mock-maps-container {
-        height: 300px;
+        height: 280px;
+      }
+      .mock-maps-popup {
+        bottom: 20px;
+        left: 10px;
+        right: 10px;
+        max-width: calc(100% - 20px);
+        padding: 15px;
       }
     }
   `}</style>
