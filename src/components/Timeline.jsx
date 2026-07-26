@@ -1,31 +1,19 @@
 import React from "react";
-import { Star, ShieldCheck, Award, TrendingUp, Radio } from "lucide-react";
+import { Star, TrendingUp, Radio } from "lucide-react";
 
 export default function Timeline() {
   const milestones = [
     {
-      year: "2019",
-      title: "Founding & Establishment",
+      year: "2025",
+      title: "Founding & Director Leadership",
       icon: <Star size={18} />,
-      desc: "Leonce Multiventure was founded with a mission to deliver premium-grade electronic imports, bridging global sourcing with local production requirements."
-    },
-    {
-      year: "2021",
-      title: "High-Frequency PCB / SMT PCBA Streamlining",
-      icon: <Award size={18} />,
-      desc: "Standardized imports of multilayer high TG PCB boards and expanded SMT/DIP PCB assembly sourcing partnerships across primary tech manufacturing zones."
-    },
-    {
-      year: "2023",
-      title: "OEM & ODM Integration",
-      icon: <ShieldCheck size={18} />,
-      desc: "Pivoted to offer direct OEM and ODM custom product procurement, ensuring international compliance certificate checks (CE, FCC, RoHS) for bulk B2B clients."
+      desc: "Leonce Multiventure began under the leadership of directors Shantilal Kumhar and Yanda Kishor, focused on premium-grade electronic imports and verified sourcing."
     },
     {
       year: "2025",
-      title: "Global Supply Chain Infrastructure",
+      title: "Global Supply Chain Setup",
       icon: <TrendingUp size={18} />,
-      desc: "Optimized shipping and logistics channels with automated customs clearance documentation and warehousing centers, achieving 99% fast-delivery timelines."
+      desc: "Set up international supplier coordination, import documentation workflows, customs support, and quality inspection processes for B2B clients."
     },
     {
       year: "2026",

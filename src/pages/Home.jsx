@@ -149,7 +149,7 @@ export default function Home() {
           <div className="intro-visual glass-card">
             <InteractiveLogo width="50%" animate={false} />
             <div className="intro-years">
-              <span className="big-year">Est. 2019</span>
+              <span className="big-year">Est. 2025</span>
               <p>Delivering high-reliability sourcing channels to major manufacturers and distributors.</p>
             </div>
           </div>
@@ -157,7 +157,7 @@ export default function Home() {
             <span className="section-subtitle">Corporate Profile</span>
             <h2 className="section-title">Global Procurement Pioneers</h2>
             <p>
-              Founded in 2019, <strong>Leonce Multiventure</strong> has established itself as India's premier B2B electronics and technology importer. We act as a critical logistics and verification bridge between state-of-the-art silicon fabrication plants worldwide and domestic engineering corporations.
+              Founded in 2025, <strong>Leonce Multiventure</strong> is building a reliable B2B electronics and technology import network across India. We act as a critical logistics and verification bridge between state-of-the-art silicon fabrication plants worldwide and domestic engineering corporations.
             </p>
             <p style={{ marginTop: 15, color: "var(--text-muted)" }}>
               We specialize in custom importing structures, taking care of initial supplier audits, international logistics paperwork, customs clearance, and quality assurance inspections so our clients can focus strictly on assembly and retail.
